@@ -199,34 +199,33 @@
         }
 
         /* General Style for Nav Links */
-.nav-link {
-    color: white !important;  /* Make text color white */
-    transition: transform 0.3s ease, color 0.3s ease;  /* Smooth transition for hover effect */
-}
+        .nav-link {
+            color: white !important;  /* Make text color white */
+            transition: transform 0.3s ease, color 0.3s ease;  /* Smooth transition for hover effect */
+        }
 
-/* Hover Effect: Popping effect on hover */
-.nav-link:hover {
-    transform: scale(1.1);  /* Slightly scale the link to make it "pop" */
-    color: #f0f0f0;  /* Slight change in color to make it stand out (optional) */
-}
+        /* Hover Effect: Popping effect on hover */
+        .nav-link:hover {
+            transform: scale(1.1);  /* Slightly scale the link to make it "pop" */
+            color: #f0f0f0;  /* Slight change in color to make it stand out (optional) */
+        }
 
-/* Optional: Style for the dropdown toggle */
-.navbar-nav .nav-item.dropdown .nav-link {
-    color: white !important;  /* Ensures the dropdown toggle has white text */
-}
+        /* Optional: Style for the dropdown toggle */
+        .navbar-nav .nav-item.dropdown .nav-link {
+            color: white !important;  /* Ensures the dropdown toggle has white text */
+        }
 
-/* Dropdown menu items */
-.dropdown-menu .dropdown-item {
-    color: black !important;  /* Optional: Make the dropdown items more readable */
-    transition: background-color 0.3s ease;
-}
+        /* Dropdown menu items */
+        .dropdown-menu .dropdown-item {
+            color: black !important;  /* Optional: Make the dropdown items more readable */
+            transition: background-color 0.3s ease;
+        }
 
-/* Hover effect for dropdown items */
-.dropdown-menu .dropdown-item:hover {
-    background-color: #f8f9fa;  /* Light background on hover for dropdown items */
-    color: #333;  /* Darker text color when hovered */
-}
-
+        /* Hover effect for dropdown items */
+        .dropdown-menu .dropdown-item:hover {
+            background-color: #f8f9fa;  /* Light background on hover for dropdown items */
+            color: #333;  /* Darker text color when hovered */
+        }
     </style>
 </head>
 <body>
@@ -235,23 +234,22 @@
         <div class="container d-flex justify-content-between align-items-center">
             <a class="navbar-brand" href="index.php"><h1>City of Koronadal Public Library</h1></a>
             <nav>
-            <ul class="nav">
-    <li class="nav-item"><a href="index.php" class="nav-link">Home</a></li>
-    <li class="nav-item"><a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#contactModal">Contact</a></li>
-    <?php if (!isset($_SESSION['user_id'])): ?>
-        <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="authDropdown" data-bs-toggle="dropdown">Account</a>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="authDropdown">
-                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">Login</a></li>
-                <li><a class="dropdown-item" href="signup.php">Sign Up</a></li>
-            </ul>
-        </li>
-    <?php else: ?>
-        <li class="nav-item"><a href="user.php" class="nav-link">Dashboard</a></li>
-        <li class="nav-item"><a href="logout.php" class="nav-link">Logout</a></li>
-    <?php endif; ?>
-</ul>
-
+                <ul class="nav">
+                    <li class="nav-item"><a href="index.php" class="nav-link">Home</a></li>
+                    <li class="nav-item"><a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#contactModal">Contact</a></li>
+                    <?php if (!isset($_SESSION['user_id'])): ?>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="authDropdown" data-bs-toggle="dropdown">Account</a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="authDropdown">
+                                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">Login</a></li>
+                                <li><a class="dropdown-item" href="signup.php">Sign Up</a></li>
+                            </ul>
+                        </li>
+                    <?php else: ?>
+                        <li class="nav-item"><a href="user.php" class="nav-link">Dashboard</a></li>
+                        <li class="nav-item"><a href="logout.php" class="nav-link">Logout</a></li>
+                    <?php endif; ?>
+                </ul>
             </nav>
         </div>
     </header>
@@ -283,6 +281,64 @@
             </ul>
         </div>
     </main>
+
+<!-- Login Modal -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="loginModalLabel">Login</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <?php if (isset($_GET['error'])): ?>
+                    <div class="alert alert-danger" role="alert">
+                        <?php echo htmlspecialchars($_GET['error']); ?>
+                    </div>
+                <?php endif; ?>
+                <?php if (isset($_GET['success'])): ?>
+                    <div class="alert alert-success" role="alert">
+                        <?php echo htmlspecialchars($_GET['success']); ?>
+                    </div>
+                <?php endif; ?>
+                <form action="login.php" method="POST">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Login</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Contact Modal -->
+    <div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="contactModalLabel">Contact Us</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Email: <a href="mailto:koronadal.library@example.com">koronadal.library@example.com</a></p>
+                    <p>Phone: +63 123 456 7890</p>
+                    <p>Address: City of Koronadal Public Library, Koronadal City, South Cotabato</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
     
     <!-- Footer -->
     <footer>
