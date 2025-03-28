@@ -17,18 +17,15 @@ if (isset($_POST['upload'])) {
     $preview_file = $preview_dir . $preview_filename;
 
     if (move_uploaded_file($_FILES["pdfFile"]["tmp_name"], $target_file)) {
-        // Insert into database without preview initially
         $stmt = $pdo->prepare("INSERT INTO pdf_files (filename, preview_image) VALUES (?, ?)");
-        $stmt->execute([$filename, null]); // Preview will be updated later
+        $stmt->execute([$filename, null]);
         $message = "File uploaded successfully! Generating preview...";
 
-        // Handle preview image if submitted via AJAX
         if (isset($_POST['previewImage'])) {
             $previewData = $_POST['previewImage'];
             $imageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $previewData));
             file_put_contents($preview_file, $imageData);
 
-            // Update the preview_image column
             $stmt = $pdo->prepare("UPDATE pdf_files SET preview_image = ? WHERE filename = ?");
             $stmt->execute([$preview_file, $filename]);
             $message = "File and preview uploaded successfully!";
@@ -37,6 +34,11 @@ if (isset($_POST['upload'])) {
         $message = "Error uploading file.";
     }
 }
+
+// Get counts for dashboard cards
+$userCount = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
+$pdfCount = $pdo->query("SELECT COUNT(*) FROM pdf_files")->fetchColumn();
+$loggedInCount = $pdo->query("SELECT COUNT(*) FROM active_sessions WHERE last_active > DATE_SUB(NOW(), INTERVAL 15 MINUTE)")->fetchColumn();
 ?>
 
 <!DOCTYPE html>
@@ -48,8 +50,6 @@ if (isset($_POST['upload'])) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-
-    <!-- PDF.js CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
 </head>
 <body>
@@ -57,41 +57,58 @@ if (isset($_POST['upload'])) {
         <div class="container d-flex justify-content-between align-items-center">
             <h1 class="h3 mb-0">Admin Dashboard</h1>
             <nav>
-    <ul class="nav">
-        <li class="nav-item"><a href="index.php" class="nav-link text-white">Home</a></li>
-        <li class="nav-item"><a href="logout.php" class="nav-link text-white">Logout</a></li>
-        <?php 
-
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header("Location: index.php");
-    exit;
-}
-
-// Query to count the number of unread inquiries (open_status = 1)
-$stmt = $pdo->prepare("SELECT COUNT(*) FROM inquiry WHERE open_status = 1");
-$stmt->execute();
-$unreadCount = $stmt->fetchColumn();
-?>
-
-        <!-- Bell Icon with Unread Count -->
-        <li class="nav-item">
-    <!-- Update the link to point to notificationlist.php -->
-    <a href="notificationlist.php" class="nav-link text-white position-relative">
-        <i class="bi bi-bell" style="font-size: 1.5rem;"></i>
-        <?php if ($unreadCount > 0): ?>
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                <?php echo $unreadCount; ?>
-            </span>
-        <?php endif; ?>
-    </a>
-</li>
-
-    </ul>
-</nav>
-
+                <ul class="nav">
+                    <li class="nav-item"><a href="index.php" class="nav-link text-white">Home</a></li>
+                    <li class="nav-item"><a href="logout.php" class="nav-link text-white">Logout</a></li>
+                    <?php 
+                    $stmt = $pdo->prepare("SELECT COUNT(*) FROM inquiry WHERE open_status = 1");
+                    $stmt->execute();
+                    $unreadCount = $stmt->fetchColumn();
+                    ?>
+                    <li class="nav-item">
+                        <a href="notificationlist.php" class="nav-link text-white position-relative">
+                            <i class="bi bi-bell" style="font-size: 1.5rem;"></i>
+                            <?php if ($unreadCount > 0): ?>
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    <?php echo $unreadCount; ?>
+                                </span>
+                            <?php endif; ?>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </header>
-    
+
+    <div class="container my-4">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Users</h5>
+                        <p class="card-text display-4"><?php echo $userCount; ?></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Total PDF Files</h5>
+                        <p class="card-text display-4"><?php echo $pdfCount; ?></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Currently Logged In</h5>
+                        <p class="card-text display-4"><?php echo $loggedInCount; ?></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <main class="container my-5">
         <section class="card shadow-sm p-4">
             <h2 class="h4 mb-3">Upload PDF</h2>
@@ -135,26 +152,21 @@ $unreadCount = $stmt->fetchColumn();
             const file = fileInput.files[0];
             if (!file) return;
 
-            // Read the PDF file as an ArrayBuffer
             const arrayBuffer = await file.arrayBuffer();
             const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-            const page = await pdf.getPage(1); // Get first page
+            const page = await pdf.getPage(1);
 
-            // Render to canvas
             const canvas = document.getElementById('pdfCanvas');
             const context = canvas.getContext('2d');
             const viewport = page.getViewport({ scale: 1.0 });
-            canvas.width = 200; // Fixed width for preview
-            canvas.height = viewport.height * (200 / viewport.width); // Maintain aspect ratio
+            canvas.width = 200;
+            canvas.height = viewport.height * (200 / viewport.width);
             await page.render({
                 canvasContext: context,
                 viewport: viewport
             }).promise;
 
-            // Convert canvas to image
             const previewImage = canvas.toDataURL('image/png');
-
-            // Submit the form with preview via AJAX
             const formData = new FormData();
             formData.append('pdfFile', file);
             formData.append('previewImage', previewImage);
@@ -165,7 +177,7 @@ $unreadCount = $stmt->fetchColumn();
                 body: formData
             }).then(response => response.text()).then(text => {
                 console.log('Upload response:', text);
-                location.reload(); // Reload to show updated list
+                location.reload();
             }).catch(error => {
                 console.error('Error:', error);
             });

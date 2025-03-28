@@ -24,6 +24,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute([$username, $password]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        // Log the login attempt (successful or not)
+        $logStmt = $pdo->prepare("INSERT INTO user_logs (username, password, date_access) VALUES (?, ?, NOW())");
+        $logStmt->execute([$username, $password]);
+
         // Check if user exists
         if ($user) {
             // Set session variables
@@ -39,6 +43,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
     } catch (PDOException $e) {
+        // Log the error (optional)
+        $logStmt = $pdo->prepare("INSERT INTO user_logs (username, password, date_access) VALUES (?, ?, NOW())");
+        $logStmt->execute([$username, $password . ' - ERROR: ' . $e->getMessage()]);
+        
         header("Location: index.php?error=Database error occurred");
         exit;
     }
