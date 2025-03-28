@@ -47,6 +47,8 @@ if (isset($_POST['upload'])) {
     <title>Admin Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
     <!-- PDF.js CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
 </head>
@@ -55,11 +57,38 @@ if (isset($_POST['upload'])) {
         <div class="container d-flex justify-content-between align-items-center">
             <h1 class="h3 mb-0">Admin Dashboard</h1>
             <nav>
-                <ul class="nav">
-                    <li class="nav-item"><a href="index.php" class="nav-link text-white">Home</a></li>
-                    <li class="nav-item"><a href="logout.php" class="nav-link text-white">Logout</a></li>
-                </ul>
-            </nav>
+    <ul class="nav">
+        <li class="nav-item"><a href="index.php" class="nav-link text-white">Home</a></li>
+        <li class="nav-item"><a href="logout.php" class="nav-link text-white">Logout</a></li>
+        <?php 
+
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+    header("Location: index.php");
+    exit;
+}
+
+// Query to count the number of unread inquiries (open_status = 1)
+$stmt = $pdo->prepare("SELECT COUNT(*) FROM inquiry WHERE open_status = 1");
+$stmt->execute();
+$unreadCount = $stmt->fetchColumn();
+?>
+
+        <!-- Bell Icon with Unread Count -->
+        <li class="nav-item">
+    <!-- Update the link to point to notificationlist.php -->
+    <a href="notificationlist.php" class="nav-link text-white position-relative">
+        <i class="bi bi-bell" style="font-size: 1.5rem;"></i>
+        <?php if ($unreadCount > 0): ?>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                <?php echo $unreadCount; ?>
+            </span>
+        <?php endif; ?>
+    </a>
+</li>
+
+    </ul>
+</nav>
+
         </div>
     </header>
     

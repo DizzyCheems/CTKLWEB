@@ -234,9 +234,26 @@
         <div class="container d-flex justify-content-between align-items-center">
             <a class="navbar-brand" href="index.php"><h1>City of Koronadal Public Library</h1></a>
             <nav>
+                <!--OPAC LIBRARY 215.119.1.190-->
                 <ul class="nav">
-                    <li class="nav-item"><a href="index.php" class="nav-link">Home</a></li>
-                    <li class="nav-item"><a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#contactModal">Contact</a></li>
+                <li class="nav-item"><a href="index.php" class="nav-link">Home</a></li>
+                <li class="nav-item"><a href="http://215.119.1.190" class="nav-link" onclick="return checkLibraryAccess()">OPAC</a></li>
+
+<script>
+function checkLibraryAccess() {
+    // This is a basic check - in a real implementation, you'd need server-side validation
+    const allowedIPRange = '215.119.1.'; // Koronadal City Public Library IP range
+    const currentIP = window.location.hostname; // This is just an example, actual IP detection needs server-side
+    
+    if (!currentIP.startsWith(allowedIPRange)) {
+        document.body.innerHTML = '<h1>This Feature is Only Available at the Koronadal City Public Library</h1>';
+        return false; // Prevents the link from being followed
+    }
+    return true; // Allows the link to be followed
+}
+</script>               
+               
+                <li class="nav-item"><a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#contactModal">Contact</a></li>
                     <?php if (!isset($_SESSION['user_id'])): ?>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="authDropdown" data-bs-toggle="dropdown">Account</a>
@@ -264,6 +281,22 @@
     
     <!-- Main Content -->
     <main>
+        <!-- Check for success message in the URL -->
+<?php if (isset($_GET['success'])): ?>
+    <div id="successMessage" class="alert alert-success" role="alert">
+        <?php echo htmlspecialchars($_GET['success']); ?>
+    </div>
+
+    <script>
+        // Set a timer to hide the success message after 2 seconds
+        setTimeout(function() {
+            var successMessage = document.getElementById('successMessage');
+            if (successMessage) {
+                successMessage.style.display = 'none';
+            }
+        }, 2000);  // 2000 milliseconds = 2 seconds
+    </script>
+<?php endif; ?>
         <!-- About Section -->
         <section class="about-section">
             <h2>About Our Library</h2>
@@ -291,7 +324,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <?php if (isset($_GET['error'])): ?>
+                <!--<?php if (isset($_GET['error'])): ?>
                     <div class="alert alert-danger" role="alert">
                         <?php echo htmlspecialchars($_GET['error']); ?>
                     </div>
@@ -300,7 +333,8 @@
                     <div class="alert alert-success" role="alert">
                         <?php echo htmlspecialchars($_GET['success']); ?>
                     </div>
-                <?php endif; ?>
+                <?php endif; ?>-->
+                
                 <form action="login.php" method="POST">
                     <div class="mb-3">
                         <label for="username" class="form-label">Username</label>
@@ -320,25 +354,39 @@
     </div>
 </div>
 
-    <!-- Contact Modal -->
-    <div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="contactModalLabel">Contact Us</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Email: <a href="mailto:koronadal.library@example.com">koronadal.library@example.com</a></p>
-                    <p>Phone: +63 123 456 7890</p>
-                    <p>Address: City of Koronadal Public Library, Koronadal City, South Cotabato</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
+<!-- Contact Modal -->
+<div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="contactModalLabel">Contact Us</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Email: <a href="mailto:koronadal.library@example.com">koronadal.library@example.com</a></p>
+                <p>Phone: +63 123 456 7890</p>
+                <p>Address: City of Koronadal Public Library, Koronadal City, South Cotabato</p>
+                
+                <!-- Inquiry Form -->
+                <form id="inquiryForm" method="POST" action="submit_inquiry.php">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Your Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Your Message</label>
+                        <textarea class="form-control" id="message" name="message" rows="3" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Inquiry</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
+</div>
+
     
     <!-- Footer -->
     <footer>
