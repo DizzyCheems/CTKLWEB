@@ -226,20 +226,40 @@
             background-color: #f8f9fa;  /* Light background on hover for dropdown items */
             color: #333;  /* Darker text color when hovered */
         }
+
+        
     </style>
+<style>
+    .header-logo {
+        height: 50px; /* Matches the h3 font size for balance */
+        width: 60px; /* Maintains aspect ratio */
+    }
+</style>    
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <div class="container d-flex justify-content-between align-items-center">
-            <a class="navbar-brand" href="index.php"><h1>City of Koronadal Public Library</h1></a>
-            <nav>
-                <!--OPAC LIBRARY 215.119.1.190-->
-                <ul class="nav">
-                <li class="nav-item"><a href="index.php" class="nav-link">Home</a></li>
-                <li class="nav-item"><a href="http://215.119.1.190" class="nav-link" onclick="return checkLibraryAccess()">OPAC</a></li>
+<!-- Header -->
+<header>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <div class="d-flex align-items-center">
+                <img src="images/logo.png" alt="Library Logo" class="header-logo me-2" style="max-height: 40px;">
+                <a class="navbar-brand" href="index.php">City of Koronadal Public Library</a>
+            </div>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-<script>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a href="index.php" class="nav-link">Home</a>
+                    </li>
+                    <li class="nav-item">
+                    <li class="nav-item"><a href="http://215.119.1.190" class="nav-link" onclick="return checkLibraryAccess()">OPAC</a></li>
+
+                    <script>
 function checkLibraryAccess() {
     // This is a basic check - in a real implementation, you'd need server-side validation
     const allowedIPRange = '215.119.1.'; // Koronadal City Public Library IP range
@@ -251,25 +271,85 @@ function checkLibraryAccess() {
     }
     return true; // Allows the link to be followed
 }
-</script>               
-               
-                <li class="nav-item"><a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#contactModal">Contact</a></li>
+</script>         
+                </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#contactModal">Contact</a>
+                    </li>
+                    
                     <?php if (!isset($_SESSION['user_id'])): ?>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="authDropdown" data-bs-toggle="dropdown">Account</a>
+                            <a class="nav-link dropdown-toggle" href="#" id="authDropdown" 
+                               data-bs-toggle="dropdown" aria-expanded="false">Account</a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="authDropdown">
-                                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">Login</a></li>
+                                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" 
+                                       data-bs-target="#loginModal">Login</a></li>
                                 <li><a class="dropdown-item" href="signup.php">Sign Up</a></li>
                             </ul>
                         </li>
                     <?php else: ?>
-                        <li class="nav-item"><a href="user.php" class="nav-link">Dashboard</a></li>
-                        <li class="nav-item"><a href="logout.php" class="nav-link">Logout</a></li>
+                        <li class="nav-item">
+                            <a href="<?php echo (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') ? 'admin.php' : 'user.php'; ?>" 
+                               class="nav-link">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="logout.php" class="nav-link">Logout</a>
+                        </li>
                     <?php endif; ?>
                 </ul>
-            </nav>
+            </div>
         </div>
-    </header>
+    </nav>
+
+    <style>
+/* Add these CSS rules to your stylesheet */
+.navbar {
+    background-color: transparent !important; /* Ensure no background color */
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white; /* Adjust text color if needed */
+}
+
+.nav-link {
+    color: white    ; /* Adjust text color if needed */
+}
+
+.nav-link:hover {
+    color: #555; /* Optional hover effect */
+}
+
+.header-logo {
+    transition: all 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+    
+    .header-logo {
+        max-height: 30px;
+    }
+    
+    .navbar-collapse {
+        padding-top: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .navbar-brand {
+        font-size: 1rem;
+    }
+    
+    .header-logo {
+        max-height: 25px;
+    }
+}
+</style>
+</header>
     
     <!-- Hero Section -->
     <div class="hero-section">
@@ -278,42 +358,140 @@ function checkLibraryAccess() {
         <p>Your gateway to a wealth of knowledge and digital resources.</p>
         <a href="signup.php" class="btn-cta">Join Now</a>
     </div>
-    
-    <!-- Main Content -->
-    <main>
-        <!-- Check for success message in the URL -->
-<?php if (isset($_GET['success'])): ?>
-    <div id="successMessage" class="alert alert-success" role="alert">
-        <?php echo htmlspecialchars($_GET['success']); ?>
-    </div>
+<!-- Main Content -->
+<main class="main-content">
+    <!-- Check for success message in the URL -->
+    <?php if (isset($_GET['success'])): ?>
+        <div id="successMessage" class="alert alert-success" role="alert">
+            <?php echo htmlspecialchars($_GET['success']); ?>
+        </div>
 
-    <script>
-        // Set a timer to hide the success message after 2 seconds
-        setTimeout(function() {
-            var successMessage = document.getElementById('successMessage');
-            if (successMessage) {
-                successMessage.style.display = 'none';
-            }
-        }, 2000);  // 2000 milliseconds = 2 seconds
-    </script>
-<?php endif; ?>
-        <!-- About Section -->
-        <section class="about-section">
+        <script>
+            // Set a timer to hide the success message after 2 seconds
+            setTimeout(function() {
+                var successMessage = document.getElementById('successMessage');
+                if (successMessage) {
+                    successMessage.style.display = 'none';
+                }
+            }, 2000);  // 2000 milliseconds = 2 seconds
+        </script>
+    <?php endif; ?>
+    <!-- About Section -->
+    <section class="about-section">
+        <div class="about-content">
             <h2>About Our Library</h2>
             <p>We provide a wide range of digital resources, books, and documents for all ages and interests. Whether you're a student, professional, or a hobbyist, our library is the perfect place for you to expand your knowledge.</p>
-        </section>
-
-        <!-- Contact Info Section -->
-        <div class="contact-info">
-            <h2>Contact Us</h2>
-            <p>If you have any questions or need assistance, please feel free to contact us:</p>
-            <ul>
-                <li>Email: <a href="mailto:koronadal.library@example.com">koronadal.library@example.com</a></li>
-                <li>Phone: +63 123 456 7890</li>
-                <li>Address: City of Koronadal Public Library, Koronadal City, South Cotabato</li>
-            </ul>
         </div>
-    </main>
+    </section>
+
+    <!-- Divider and Contact Info Section -->
+    <div class="divider"></div> <!-- Divider before Contact Us -->
+    <div class="contact-info">
+        <h2>Contact Us</h2>
+        <p>If you have any questions or need assistance, please feel free to contact us:</p>
+        <ul>
+            <li>Email: <a href="mailto:koronadal.library@example.com">koronadal.library@example.com</a></li>
+            <li>Phone: +63 123 456 7890</li>
+            <li>Address: City of Koronadal Public Library, Koronadal City, South Cotabato</li>
+        </ul>
+    </div>
+</main>
+
+<style>
+    /* Main content background image */
+    .main-content {
+        background-image: url('images/hallway.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed; /* Optional: Makes the background fixed while scrolling */
+        padding: 2rem 0; /* Add padding to the top and bottom */
+        min-height: 100vh; /* Ensure it takes up the full viewport height */
+    }
+
+    /* About Section - Full width */
+    .about-section {
+        width: 100%; /* Full width of the parent container */
+        margin: 0; /* Remove any default margins */
+        padding: 2rem 0; /* Add vertical padding */
+        background-color: rgba(255, 255, 255, 0.9); /* Keep the semi-transparent background */
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    }
+
+    /* Content inside About Section - Constrain width for readability */
+    .about-section .about-content {
+        max-width: 1200px; /* Wider content area, but still constrained for readability */
+        margin: 0 auto; /* Center the content */
+        padding: 0 1rem; /* Add some padding on the sides for smaller screens */
+    }
+
+    .about-section h2 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        color: #333;
+    }
+    .about-section p {
+        font-size: 1.1rem;
+        color: #555;
+        line-height: 1.6;
+    }
+
+    /* Divider before Contact Us */
+    .divider {
+        width: 80%; /* Slightly narrower than full width for a refined look */
+        height: 2px; /* Thin divider */
+        background-color: #ccc; /* Light gray divider */
+        margin: 3rem auto; /* Center the divider with extra spacing to push Contact Us lower */
+    }
+
+    /* Contact Info Section - Positioned lower */
+    .main-content .contact-info {
+        background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
+        border-radius: 10px; /* Rounded corners */
+        padding: 1.5rem; /* Padding inside the section */
+        margin: 0 auto 3rem auto; /* Center the section with extra bottom margin */
+        max-width: 800px; /* Limit the width for better readability */
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    }
+
+    /* Style for the contact info section */
+    .contact-info h2 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        color: #333;
+    }
+    .contact-info p {
+        font-size: 1.1rem;
+        color: #555;
+        margin-bottom: 1rem;
+    }
+    .contact-info ul {
+        list-style: none;
+        padding: 0;
+    }
+    .contact-info ul li {
+        font-size: 1.1rem;
+        color: #555;
+        margin-bottom: 0.5rem;
+    }
+    .contact-info ul li a {
+        color: #007bff;
+        text-decoration: none;
+    }
+    .contact-info ul li a:hover {
+        text-decoration: underline;
+    }
+
+    /* Ensure the success message alert matches the style */
+    .main-content .alert {
+        max-width: 800px;
+        margin: 1rem auto;
+        font-size: 1.1rem;
+        background-color: rgba(255, 255, 255, 0.9); /* Match the semi-transparent background */
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+</style>
 
 <!-- Login Modal -->
 <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">

@@ -46,6 +46,34 @@ $totalPages = ceil($totalRecords / $perPage);
     <title>User Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        body {
+            background-image: url('images/books.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        /* Ensure the header remains solid dark */
+        header.bg-dark {
+            background-color: #212529 !important; /* Bootstrap's bg-dark color */
+        }
+        /* Apply semi-transparent background to main content areas only */
+        main .container,
+        main .card {
+            background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
+            border-radius: 10px;
+        }
+        /* Apply semi-transparent background to the contact-info section */
+        .contact-info {
+            background-color: rgba(255, 255, 255, 0.9) !important; /* Override bg-light */
+            border-radius: 10px;
+        }
+        /* Ensure the footer remains solid dark */
+        footer.bg-dark {
+            background-color: #212529 !important; /* Bootstrap's bg-dark color */
+        }
+        /* Existing styles for cards and modal */
         .card-hover {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
@@ -78,19 +106,58 @@ $totalPages = ceil($totalRecords / $perPage);
     </style>
 </head>
 <body>
-    <header class="bg-dark text-white py-3">
-        <div class="container d-flex justify-content-between align-items-center">
-            <h1 class="h3 mb-0">User Dashboard</h1>
-            <nav>
-                <ul class="nav">
-                    <li class="nav-item"><a href="index.php" class="nav-link text-white">Home</a></li>
-                    <li class="nav-item"><a href="#" class="nav-link text-white" data-bs-toggle="modal" data-bs-target="#contactModal">Contact</a></li>
-                    <li class="nav-item"><a href="logout.php" class="nav-link text-white">Logout</a></li>
-                </ul>
-            </nav>
+<header class="header-modern text-white py-3">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+            <img src="images/logo.png" alt="Library Logo" class="header-logo me-3">
+            <h1 class="header-title mb-0">User Dashboard</h1>
         </div>
-    </header>
-    
+        <nav>
+            <ul class="nav">
+                <li class="nav-item"><a href="index.php" class="nav-link text-white">Home</a></li>
+                <li class="nav-item"><a href="#" class="nav-link text-white" data-bs-toggle="modal" data-bs-target="#contactModal">Contact</a></li>
+                <li class="nav-item"><a href="logout.php" class="nav-link text-white">Logout</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<style>
+    .header-modern {
+        background: linear-gradient(90deg, #1a2526 0%, #2c3e50 100%); /* Modern gradient background */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Subtle shadow for depth */
+        position: sticky; /* Optional: Makes the header sticky */
+        top: 0;
+        z-index: 1000;
+    }
+    .header-logo {
+        height: 2.5rem; /* Slightly larger to match the larger text */
+        width: auto; /* Maintains aspect ratio */
+    }
+    .header-title {
+        font-size: 2rem; /* Larger title (was h3 at ~1.75rem) */
+        font-weight: 600; /* Bold for a modern look */
+        letter-spacing: 0.5px; /* Slight spacing for readability */
+    }
+    .nav-link {
+        font-size: 1.25rem; /* Larger navigation links (default is ~1rem) */
+        font-weight: 500; /* Medium weight for a modern feel */
+        padding: 0.5rem 1rem; /* More padding for better click area */
+        transition: color 0.3s ease, transform 0.3s ease; /* Smooth hover effects */
+    }
+    .nav-link:hover {
+        color: #00ddeb; /* Modern cyan hover color */
+        transform: translateY(-2px); /* Slight lift on hover */
+        display: inline-block; /* Needed for transform to work */
+    }
+</style>
+
+<style>
+    .header-logo {
+        height: 100px; /* Matches the h3 font size for balance */
+        width: 100px; /* Maintains aspect ratio */
+    }
+</style>    
     <main class="container my-5">
         <section class="card shadow-sm p-4 mb-4">
             <h2 class="h4 mb-3">Search PDFs</h2>

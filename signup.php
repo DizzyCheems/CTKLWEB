@@ -37,12 +37,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         /* Ensure body takes up at least full height of the viewport */
         html, body {
             height: 100%;
+            margin: 0;
         }
 
         /* Flexbox to align the footer at the bottom */
         body {
             display: flex;
             flex-direction: column;
+            background-image: url('images/facade.jpeg'); /* Add background image */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed; /* Optional: Makes the background fixed while scrolling */
         }
 
         main {
@@ -52,20 +58,81 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         footer {
             margin-top: auto; /* Push footer to the bottom */
         }
+
+        /* Ensure the header and footer remain solid */
+        header.bg-dark,
+        footer.bg-dark {
+            background-color: #212529 !important; /* Bootstrap's bg-dark color */
+        }
+
+        /* Style the sign-up card with a semi-transparent background */
+        .card {
+            background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
+            border-radius: 10px; /* Rounded corners */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+        }
+
+        /* Style the form elements for better readability */
+        .form-label {
+            color: #333; /* Darker text for contrast */
+        }
+        .form-control {
+            border-color: #ced4da; /* Bootstrap default border color */
+            background-color: #fff; /* Ensure input fields are fully opaque */
+        }
+        .form-control:focus {
+            border-color: #007bff; /* Bootstrap primary color on focus */
+            box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25); /* Bootstrap focus shadow */
+        }
+
+        /* Style the button */
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #004085;
+        }
+
+        /* Style the link in the card */
+        .card a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .card a:hover {
+            text-decoration: underline;
+        }
+
+        /* Style the alert (if there's an error) */
+        .alert {
+            background-color: rgba(255, 255, 255, 0.9); /* Match the card's semi-transparent background */
+            border-radius: 5px;
+        }
     </style>
+
+<style>
+    .header-logo {
+        height: 100px; /* Matches the h3 font size for balance */
+        width: 100px; /* Maintains aspect ratio */
+    }
+</style>    
 </head>
 <body>
-    <header class="bg-dark text-white py-3">
+<header class="bg-dark text-white py-3">
         <div class="container d-flex justify-content-between align-items-center">
-            <h1 class="h3 mb-0">City of Koronadal Public Library</h1>
+            <div class="d-flex align-items-center">
+                <img src="images/logo.png" alt="Library Logo" class="header-logo me-3">
+                <h1 class="header-title mb-0">City of Koronadal Public Library</h1>
+            </div>
             <nav>
                 <ul class="nav">
                     <li class="nav-item"><a href="index.php" class="nav-link text-white">Home</a></li>
                 </ul>
             </nav>
         </div>
-    </header>
-    
+    </header>    
     <main class="container my-5">
         <section class="card shadow-sm p-4 mx-auto" style="max-width: 400px;">
             <h2 class="h4 mb-3 text-center">Sign Up</h2>
