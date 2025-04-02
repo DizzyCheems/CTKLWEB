@@ -241,8 +241,8 @@
 <header>
     <nav class="navbar navbar-expand-lg">
         <div class="container">
-            <div class="d-flex align-items-center">
-                <img src="images/logo.png" alt="Library Logo" class="header-logo me-2" style="max-height: 40px;">
+        <div class="d-flex align-items-center">
+                <img src="images/logo.png" alt="Library Logo" class="header-logo me-3">
                 <a class="navbar-brand" href="index.php">City of Koronadal Public Library</a>
             </div>
             
@@ -302,26 +302,32 @@ function checkLibraryAccess() {
     </nav>
 
     <style>
-/* Add these CSS rules to your stylesheet */
+/* Updated CSS with 110px logo height and header position adjustment */
 .navbar {
-    background-color: transparent !important; /* Ensure no background color */
+    background-color: transparent !important;
+    padding: 0.5rem 1rem;    /* Reduced top padding for better balance */
+    margin-top: -20px;      /* Moves the entire header up */
+    position: relative;     /* Ensures proper positioning context */
 }
 
 .navbar-brand {
     font-size: 1.5rem;
     font-weight: bold;
-    color: white; /* Adjust text color if needed */
+    color: white;
 }
 
 .nav-link {
-    color: white    ; /* Adjust text color if needed */
+    color: white;
 }
 
 .nav-link:hover {
-    color: #555; /* Optional hover effect */
+    color: #555;
 }
 
 .header-logo {
+    height: 90px;         /* Maintained requested 110px */
+    width: auto;          /* Maintains aspect ratio */
+    object-fit: contain;  /* Prevents deformation */
     transition: all 0.3s ease;
 }
 
@@ -331,7 +337,7 @@ function checkLibraryAccess() {
     }
     
     .header-logo {
-        max-height: 30px;
+        height: 80px;     /* Reduced proportionally for tablets */
     }
     
     .navbar-collapse {
@@ -345,7 +351,7 @@ function checkLibraryAccess() {
     }
     
     .header-logo {
-        max-height: 25px;
+        height: 60px;     /* Reduced proportionally for mobile */
     }
 }
 </style>
