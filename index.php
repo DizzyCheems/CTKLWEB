@@ -257,21 +257,8 @@
                         <a href="index.php" class="nav-link">Home</a>
                     </li>
                     <li class="nav-item">
-                    <li class="nav-item"><a href="http://215.119.1.190" class="nav-link" onclick="return checkLibraryAccess()">OPAC</a></li>
+                    <li class="nav-item"><a href="http://215.119.1.190" class="nav-link">OPAC</a></li>
 
-                    <script>
-function checkLibraryAccess() {
-    // This is a basic check - in a real implementation, you'd need server-side validation
-    const allowedIPRange = '215.119.1.'; // Koronadal City Public Library IP range
-    const currentIP = window.location.hostname; // This is just an example, actual IP detection needs server-side
-    
-    if (!currentIP.startsWith(allowedIPRange)) {
-        document.body.innerHTML = '<h1>This Feature is Only Available at the Koronadal City Public Library</h1>';
-        return false; // Prevents the link from being followed
-    }
-    return true; // Allows the link to be followed
-}
-</script>         
                 </li>
                     <li class="nav-item">
                         <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#contactModal">Contact</a>
