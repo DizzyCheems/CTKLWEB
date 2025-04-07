@@ -309,7 +309,10 @@ include 'config.php';
                 <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                     <ul class="navbar-nav">
                         <li class="nav-item"><a href="index.php" class="nav-link">Home</a></li>
-                        <li class="nav-item"><a href="koha Link here" class="nav-link">OPAC</a></li>
+                        <!-- OPAC address http://215.119.1.190/ --> 
+                        
+                        <li class="nav-item"><a href="http://61.245.13.173:7500" class="nav-link text-white">OPAC</a></li>
+
                         <li class="nav-item"><a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#contactModal">Contact</a></li>
                         <?php if (!isset($_SESSION['user_id'])): ?>
                             <li class="nav-item dropdown">
