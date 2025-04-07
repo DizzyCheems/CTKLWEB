@@ -52,15 +52,9 @@ if (isset($_POST['delete'])) {
         $pdf_path = "uploads/" . $file['filename'];
         $preview_path = $file['preview_image'];
 
-        // Delete the files from the server
-        if (file_exists($pdf_path)) {
-            unlink($pdf_path);
-        }
-        if ($preview_path && file_exists($preview_path)) {
-            unlink($preview_path);
-        }
+        if (file_exists($pdf_path)) unlink($pdf_path);
+        if ($preview_path && file_exists($preview_path)) unlink($preview_path);
 
-        // Delete the record from the database
         $stmt = $pdo->prepare("DELETE FROM pdf_files WHERE id = ?");
         $stmt->execute([$id]);
         $alert = ['type' => 'success', 'message' => 'File deleted successfully!'];
@@ -74,11 +68,8 @@ if (isset($_POST['update'])) {
     $id = $_POST['id'];
     $new_filename = $_POST['new_filename'];
 
-    // Sanitize the new filename to avoid issues
     $new_filename = preg_replace('/[^A-Za-z0-9\-\_\.]/', '', $new_filename);
-    if (pathinfo($new_filename, PATHINFO_EXTENSION) !== 'pdf') {
-        $new_filename .= '.pdf';
-    }
+    if (pathinfo($new_filename, PATHINFO_EXTENSION) !== 'pdf') $new_filename .= '.pdf';
 
     $stmt = $pdo->prepare("SELECT filename, preview_image FROM pdf_files WHERE id = ?");
     $stmt->execute([$id]);
@@ -91,17 +82,9 @@ if (isset($_POST['update'])) {
         $new_preview_filename = pathinfo($new_filename, PATHINFO_FILENAME) . '.png';
         $new_preview_path = "uploads/previews/" . $new_preview_filename;
 
-        // Rename the PDF file
-        if (file_exists($old_pdf_path)) {
-            rename($old_pdf_path, $new_pdf_path);
-        }
+        if (file_exists($old_pdf_path)) rename($old_pdf_path, $new_pdf_path);
+        if ($old_preview_path && file_exists($old_preview_path)) rename($old_preview_path, $new_preview_path);
 
-        // Rename the preview image if it exists
-        if ($old_preview_path && file_exists($old_preview_path)) {
-            rename($old_preview_path, $new_preview_path);
-        }
-
-        // Update the database
         $stmt = $pdo->prepare("UPDATE pdf_files SET filename = ?, preview_image = ? WHERE id = ?");
         $stmt->execute([$new_filename, $new_preview_path, $id]);
         $alert = ['type' => 'success', 'message' => 'File updated successfully!'];
@@ -114,6 +97,25 @@ if (isset($_POST['update'])) {
 $userCount = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
 $pdfCount = $pdo->query("SELECT COUNT(*) FROM pdf_files")->fetchColumn();
 $loggedInCount = $pdo->query("SELECT COUNT(*) FROM active_sessions WHERE last_active > DATE_SUB(NOW(), INTERVAL 15 MINUTE)")->fetchColumn();
+
+// Data for Charts
+// 1. Monthly User Visits (last 12 months)
+$monthlyVisits = [];
+for ($i = 11; $i >= 0; $i--) {
+    $month = date('Y-m', strtotime("-$i months"));
+    $stmt = $pdo->prepare("SELECT COUNT(DISTINCT user_id) as visits FROM active_sessions WHERE DATE_FORMAT(last_active, '%Y-%m') = ?");
+    $stmt->execute([$month]);
+    $monthlyVisits[$month] = $stmt->fetchColumn();
+}
+
+// 2. User Traffic (last 7 days)
+$dailyTraffic = [];
+for ($i = 6; $i >= 0; $i--) {
+    $day = date('Y-m-d', strtotime("-$i days"));
+    $stmt = $pdo->prepare("SELECT COUNT(*) as traffic FROM active_sessions WHERE DATE(last_active) = ?");
+    $stmt->execute([$day]);
+    $dailyTraffic[$day] = $stmt->fetchColumn();
+}
 ?>
 
 <!DOCTYPE html>
@@ -126,8 +128,8 @@ $loggedInCount = $pdo->query("SELECT COUNT(*) FROM active_sessions WHERE last_ac
     <link rel="stylesheet" href="style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
-    <!-- Include SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Added Chart.js -->
     <style>
         body {
             background-image: url('images/hallway.jpg');
@@ -137,63 +139,56 @@ $loggedInCount = $pdo->query("SELECT COUNT(*) FROM active_sessions WHERE last_ac
             background-attachment: fixed;
             min-height: 100vh;
         }
-        /* Apply semi-transparent background to main content areas only */
         main .container,
         main .card {
-            background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
+            background-color: rgba(255, 255, 255, 0.9);
             border-radius: 10px;
         }
-        /* Apply semi-transparent background to the container in the dashboard cards section */
         .dashboard-cards .container {
             background-color: rgba(255, 255, 255, 0.9);
             border-radius: 10px;
         }
-        /* Ensure the footer remains solid dark */
         footer.bg-dark {
-            background-color: #212529 !important; /* Bootstrap's bg-dark color */
+            background-color: #212529 !important;
         }
-        /* Header styles */
         .header-modern {
-            background: linear-gradient(90deg, #1a2526 0%, #2c3e50 100%); /* Modern gradient background */
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Subtle shadow for depth */
-            position: sticky; /* Makes the header sticky */
+            background: linear-gradient(90deg, #1a2526 0%, #2c3e50 100%);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            position: sticky;
             top: 0;
             z-index: 1000;
         }
         .header-logo {
-            height: 2.5rem; /* Matches the larger text size */
-            width: auto; /* Maintains aspect ratio */
+            height: 2.5rem;
+            width: auto;
         }
         .header-title {
-            font-size: 2rem; /* Larger title */
-            font-weight: 600; /* Bold for a modern look */
-            letter-spacing: 0.5px; /* Slight spacing for readability */
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
         }
         .nav-link {
-            font-size: 1.25rem; /* Larger navigation links */
-            font-weight: 500; /* Medium weight for a modern feel */
-            padding: 0.5rem 1rem; /* More padding for better click area */
-            transition: color 0.3s ease, transform 0.3s ease; /* Smooth hover effects */
+            font-size: 1.25rem;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            transition: color 0.3s ease, transform 0.3s ease;
         }
         .nav-link:hover {
-            color: #00ddeb; /* Modern cyan hover color */
-            transform: translateY(-2px); /* Slight lift on hover */
-            display: inline-block; /* Needed for transform to work */
+            color: #00ddeb;
+            transform: translateY(-2px);
+            display: inline-block;
         }
-        /* Style for the notification bell */
         .nav-link i.bi-bell {
-            font-size: 1.75rem; /* Larger bell icon to match the larger text */
-            transition: color 0.3s ease; /* Smooth color transition on hover */
+            font-size: 1.75rem;
+            transition: color 0.3s ease;
         }
         .nav-link:hover i.bi-bell {
-            color: #00ddeb; /* Match the hover color of the nav links */
+            color: #00ddeb;
         }
-        /* Style for the badge */
         .badge {
-            font-size: 0.75rem; /* Slightly larger for readability */
-            padding: 0.3rem 0.5rem; /* Adjust padding for better appearance */
+            font-size: 0.75rem;
+            padding: 0.3rem 0.5rem;
         }
-        /* Style for action buttons */
         .action-buttons {
             display: flex;
             gap: 0.5rem;
@@ -201,6 +196,12 @@ $loggedInCount = $pdo->query("SELECT COUNT(*) FROM active_sessions WHERE last_ac
         .action-buttons .btn {
             padding: 0.25rem 0.5rem;
             font-size: 0.875rem;
+        }
+        .chart-container {
+            position: relative;
+            margin: auto;
+            height: 400px;
+            width: 100%;
         }
     </style>
 </head>
@@ -267,6 +268,25 @@ $loggedInCount = $pdo->query("SELECT COUNT(*) FROM active_sessions WHERE last_ac
     </div>
 
     <main class="container my-5">
+        <!-- User Analytics Section with Charts -->
+        <section class="card shadow-sm p-4 mb-4">
+            <h2 class="h4 mb-3">User Analytics</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Monthly User Visits (Last 12 Months)</h5>
+                    <div class="chart-container">
+                        <canvas id="monthlyVisitsChart"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h5>Daily User Traffic (Last 7 Days)</h5>
+                    <div class="chart-container">
+                        <canvas id="dailyTrafficChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section class="card shadow-sm p-4">
             <h2 class="h4 mb-3">Upload PDF</h2>
             <?php if (isset($message) && !$alert): ?>
@@ -356,7 +376,7 @@ $loggedInCount = $pdo->query("SELECT COUNT(*) FROM active_sessions WHERE last_ac
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Display SweetAlert if an action was performed
+        // SweetAlert for actions
         <?php if ($alert): ?>
             document.addEventListener('DOMContentLoaded', function() {
                 Swal.fire({
@@ -364,7 +384,7 @@ $loggedInCount = $pdo->query("SELECT COUNT(*) FROM active_sessions WHERE last_ac
                     title: '<?php echo $alert['type'] === 'success' ? 'Success!' : 'Error!'; ?>',
                     text: '<?php echo $alert['message']; ?>',
                     confirmButtonText: 'OK',
-                    timer: 3000, // Auto-close after 3 seconds
+                    timer: 3000,
                     timerProgressBar: true
                 });
             });
@@ -402,7 +422,7 @@ $loggedInCount = $pdo->query("SELECT COUNT(*) FROM active_sessions WHERE last_ac
                 body: formData
             }).then(response => response.text()).then(text => {
                 console.log('Upload response:', text);
-                location.reload(); // Reload to trigger SweetAlert
+                location.reload();
             }).catch(error => {
                 console.error('Error:', error);
                 Swal.fire({
@@ -414,7 +434,7 @@ $loggedInCount = $pdo->query("SELECT COUNT(*) FROM active_sessions WHERE last_ac
             });
         });
 
-        // Handle Edit Modal Data Population
+        // Edit Modal Data Population
         const editModal = document.getElementById('editModal');
         editModal.addEventListener('show.bs.modal', function (event) {
             const button = event.relatedTarget;
@@ -428,7 +448,7 @@ $loggedInCount = $pdo->query("SELECT COUNT(*) FROM active_sessions WHERE last_ac
             newFilename.value = filename;
         });
 
-        // Handle Delete Modal Data Population
+        // Delete Modal Data Population
         const deleteModal = document.getElementById('deleteModal');
         deleteModal.addEventListener('show.bs.modal', function (event) {
             const button = event.relatedTarget;
@@ -436,6 +456,49 @@ $loggedInCount = $pdo->query("SELECT COUNT(*) FROM active_sessions WHERE last_ac
 
             const deleteId = document.getElementById('deleteId');
             deleteId.value = id;
+        });
+
+        // Chart.js Scripts
+        // 1. Monthly User Visits Chart
+        const monthlyVisitsCtx = document.getElementById('monthlyVisitsChart').getContext('2d');
+        new Chart(monthlyVisitsCtx, {
+            type: 'bar',
+            data: {
+                labels: <?php echo json_encode(array_keys($monthlyVisits)); ?>,
+                datasets: [{
+                    label: 'User Visits',
+                    data: <?php echo json_encode(array_values($monthlyVisits)); ?>,
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+
+        // 2. Daily User Traffic Chart
+        const dailyTrafficCtx = document.getElementById('dailyTrafficChart').getContext('2d');
+        new Chart(dailyTrafficCtx, {
+            type: 'line',
+            data: {
+                labels: <?php echo json_encode(array_keys($dailyTraffic)); ?>,
+                datasets: [{
+                    label: 'Daily Traffic',
+                    data: <?php echo json_encode(array_values($dailyTraffic)); ?>,
+                    fill: false,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
         });
     </script>
 </body>

@@ -4,10 +4,13 @@ include 'config.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'];
     $password = $_POST['password'];
+    $password_repeat = $_POST['password_repeat'];
 
     // Basic validation
-    if (empty($email) || empty($password)) {
+    if (empty($email) || empty($password) || empty($password_repeat)) {
         $error = "All fields are required";
+    } elseif ($password !== $password_repeat) {
+        $error = "Passwords do not match";
     } else {
         // Check if email already exists
         $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ?");
@@ -15,10 +18,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($stmt->fetchColumn() > 0) {
             $error = "Email already registered";
         } else {
-            // Insert new user (email as username)
+            // Hash the password and insert new user
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
             $stmt = $pdo->prepare("INSERT INTO users (username, password, role) VALUES (?, ?, 'user')");
-            $stmt->execute([$email, $password]); // Note: Hash password in production
-            header("Location: index.php?signup_success=Registration successful! Please login.");
+            $stmt->execute([$email, $hashed_password]);
+            header("Location: index.php?signup_success=You have successfully registered! You can now login.");
             exit;
         }
     }
@@ -34,93 +38,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Ensure body takes up at least full height of the viewport */
-        html, body {
-            height: 100%;
-            margin: 0;
-        }
-
-        /* Flexbox to align the footer at the bottom */
+        html, body { height: 100%; margin: 0; }
         body {
             display: flex;
             flex-direction: column;
-            background-image: url('images/facade.jpeg'); /* Add background image */
+            background-image: url('images/facade.jpeg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            background-attachment: fixed; /* Optional: Makes the background fixed while scrolling */
+            background-attachment: fixed;
         }
-
-        main {
-            flex-grow: 1; /* Allow main content to expand and take up space */
-        }
-
-        footer {
-            margin-top: auto; /* Push footer to the bottom */
-        }
-
-        /* Ensure the header and footer remain solid */
-        header.bg-dark,
-        footer.bg-dark {
-            background-color: #212529 !important; /* Bootstrap's bg-dark color */
-        }
-
-        /* Style the sign-up card with a semi-transparent background */
+        main { flex-grow: 1; }
+        footer { margin-top: auto; }
+        header.bg-dark, footer.bg-dark { background-color: #212529 !important; }
         .card {
-            background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
-            border-radius: 10px; /* Rounded corners */
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
-
-        /* Style the form elements for better readability */
-        .form-label {
-            color: #333; /* Darker text for contrast */
-        }
-        .form-control {
-            border-color: #ced4da; /* Bootstrap default border color */
-            background-color: #fff; /* Ensure input fields are fully opaque */
-        }
-        .form-control:focus {
-            border-color: #007bff; /* Bootstrap primary color on focus */
-            box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25); /* Bootstrap focus shadow */
-        }
-
-        /* Style the button */
+        .form-label { color: #333; }
+        .form-control { border-color: #ced4da; background-color: #fff; }
+        .form-control:focus { border-color: #007bff; box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25); }
         .btn-primary {
             background-color: #007bff;
             border-color: #007bff;
             transition: background-color 0.3s ease, border-color 0.3s ease;
         }
-        .btn-primary:hover {
-            background-color: #0056b3;
-            border-color: #004085;
-        }
-
-        /* Style the link in the card */
-        .card a {
-            color: #007bff;
-            text-decoration: none;
-        }
-        .card a:hover {
-            text-decoration: underline;
-        }
-
-        /* Style the alert (if there's an error) */
-        .alert {
-            background-color: rgba(255, 255, 255, 0.9); /* Match the card's semi-transparent background */
-            border-radius: 5px;
-        }
+        .btn-primary:hover { background-color: #0056b3; border-color: #004085; }
+        .card a { color: #007bff; text-decoration: none; }
+        .card a:hover { text-decoration: underline; }
+        .alert { background-color: rgba(255, 255, 255, 0.9); border-radius: 5px; }
+        .header-logo { height: 100px; width: 100px; }
     </style>
-
-<style>
-    .header-logo {
-        height: 100px; /* Matches the h3 font size for balance */
-        width: 100px; /* Maintains aspect ratio */
-    }
-</style>    
 </head>
 <body>
-<header class="bg-dark text-white py-3">
+    <header class="bg-dark text-white py-3">
         <div class="container d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
                 <img src="images/logo.png" alt="Library Logo" class="header-logo me-3">
@@ -148,16 +100,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <label for="password" class="form-label">Password</label>
                     <input type="password" name="password" id="password" class="form-control" placeholder="Enter your password" required>
                 </div>
+                <div class="mb-3">
+                    <label for="password_repeat" class="form-label">Confirm Password</label>
+                    <input type="password" name="password_repeat" id="password_repeat" class="form-control" placeholder="Confirm your password" required>
+                </div>
                 <button type="submit" class="btn btn-primary w-100">Sign Up</button>
             </form>
             <p class="text-center mt-3">Already have an account? <a href="index.php">Login here</a></p>
         </section>
     </main>
-
     <footer class="bg-dark text-white text-center py-3 mt-4">
         <p class="mb-0">© 2025 City of Koronadal Public Library</p>
     </footer>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
