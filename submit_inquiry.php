@@ -1,28 +1,61 @@
 <?php
-// Include the database connection from config.php
-include('config.php');
+include 'config.php';
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Sanitize and validate user input
-    $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
-    $message = htmlspecialchars($_POST['message']);  // To prevent XSS attacks
+if (!isset($_SESSION['user_id'])) {
+    header("Location: index.php?error=Please log in to send a message");
+    exit;
+}
 
-    // Check if the email is valid
-    if (filter_var($email, FILTER_VALIDATE_EMAIL) && !empty($message)) {
-        try {
-            // Prepare the SQL statement for insertion
-            $stmt = $pdo->prepare("INSERT INTO inquiry (email, message) VALUES (?, ?)");
-            // Execute the query with the sanitized user input
-            $stmt->execute([$email, $message]);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = trim($_POST['email']);
+    $message = trim($_POST['message']);
+    $sender_id = $_SESSION['user_id'];
 
-            // Redirect to index.php with a success message
-            header('Location: index.php?success=Inquiry%20submitted%20successfully.');
-            exit;  // Ensure no further code is executed after the redirect
-        } catch (PDOException $e) {
-            echo "Error: " . $e->getMessage();
-        }
-    } else {
-        echo "Please provide a valid email and a message.";
+    // Basic validation
+    if (empty($email) || empty($message)) {
+        header("Location: index.php?error=All fields are required");
+        exit;
     }
+
+    try {
+        // Check current user's email
+        $stmt = $pdo->prepare("SELECT email FROM users WHERE id = ?");
+        $stmt->execute([$sender_id]);
+        $current_email = $stmt->fetchColumn();
+
+        // If email is NULL or empty, update it with the provided email
+        if ($current_email === false || $current_email === null || $current_email === '') {
+            $stmt = $pdo->prepare("UPDATE users SET email = ? WHERE id = ?");
+            $stmt->execute([$email, $sender_id]);
+        } elseif ($current_email !== $email) {
+            header("Location: index.php?error=Provided email does not match your account");
+            exit;
+        }
+
+        // Get an admin to send the message to (e.g., the first admin)
+        $stmt = $pdo->prepare("SELECT id FROM users WHERE role = 'admin' LIMIT 1");
+        $stmt->execute();
+        $receiver_id = $stmt->fetchColumn();
+
+        if (!$receiver_id) {
+            header("Location: index.php?error=No admin available to receive your message");
+            exit;
+        }
+
+        // Insert the message into the messages table
+        $stmt = $pdo->prepare("INSERT INTO messages (sender_id, receiver_id, message) VALUES (?, ?, ?)");
+        $stmt->execute([$sender_id, $receiver_id, $message]);
+
+        // Redirect to the chatting page after submission
+        header("Location: user_notificationlist.php?success=Your message has been sent!");
+        exit;
+
+    } catch (PDOException $e) {
+        header("Location: index.php?error=Database error occurred: " . $e->getMessage());
+        exit;
+    }
+} else {
+    header("Location: index.php");
+    exit;
 }
 ?>

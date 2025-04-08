@@ -313,7 +313,10 @@ include 'config.php';
                         
                         <li class="nav-item"><a href="http://61.245.13.173:7500" class="nav-link text-white">OPAC</a></li>
 
-                        <li class="nav-item"><a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#contactModal">Contact</a></li>
+                        <?php if(isset($_SESSION['user_id'])): ?>
+    <li class="nav-item"><a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#contactModal">Contact</a></li>
+<?php endif; ?>
+
                         <?php if (!isset($_SESSION['user_id'])): ?>
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="authDropdown" 
@@ -403,36 +406,50 @@ include 'config.php';
         </div>
     </div>
 
-    <!-- Contact Modal -->
-    <div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="contactModalLabel">Contact Us</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Email: <a href="mailto:koronadal.library@example.com">koronadal.library@example.com</a></p>
-                    <p>Phone: +63 123 456 7890</p>
-                    <p>Address: City of Koronadal Public Library, Koronadal City, South Cotabato</p>
-                    <form id="inquiryForm" method="POST" action="submit_inquiry.php">
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Your Email</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="message" class="form-label">Your Message</label>
-                            <textarea class="form-control" id="message" name="message" rows="3" required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Submit Inquiry</button>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
+<!-- Contact Modal -->
+<div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="contactModalLabel">Contact Us</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Email: <a href="mailto:koronadal.library@example.com">koronadal.library@example.com</a></p>
+                <p>Phone: +63 123 456 7890</p>
+                <p>Address: City of Koronadal Public Library, Koronadal City, South Cotabato</p>
+                <form id="inquiryForm" method="POST" action="submit_inquiry.php">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Your Email</label>
+                        <?php
+                        // Fetch user's email from the database if logged in
+                        if (isset($_SESSION['user_id'])) {
+                            $stmt = $pdo->prepare("SELECT email FROM users WHERE id = ?");
+                            $stmt->execute([$_SESSION['user_id']]);
+                            $user_email = $stmt->fetchColumn();
+                            // If email is NULL, allow user to input it
+                            if ($user_email === false || $user_email === null) {
+                                $user_email = '';
+                            }
+                        }
+                        ?>
+                        <input type="email" class="form-control" id="email" name="email" 
+                               value="<?php echo htmlspecialchars($user_email ?? ''); ?>" 
+                               <?php echo isset($_SESSION['user_id']) && $user_email !== '' ? 'readonly' : ''; ?> required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Your Message</label>
+                        <textarea class="form-control" id="message" name="message" rows="3" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Inquiry</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
+</div>
 
     <!-- Footer -->
     <footer>

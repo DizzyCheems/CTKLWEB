@@ -3,50 +3,21 @@ include 'config.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: index.php");
-    exit;
+    exit();
 }
 
-// Handle Mark as Read action
-if (isset($_GET['mark_read'])) {
-    $inquiry_id = $_GET['mark_read'];
+$user_id = $_SESSION['user_id'];
 
-    // Update the open_status to 0 for the specific inquiry
-    $stmt = $pdo->prepare("UPDATE inquiry SET open_status = 0 WHERE id = ?");
-    $stmt->execute([$inquiry_id]);
-
-    // Redirect to the same page to refresh the notification status
-    header("Location: notificationlist.php");
-    exit; // Make sure to stop further script execution
-}
-
-// Pagination setup
-$limit = 10;
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$offset = ($page - 1) * $limit;
-
-// Search setup
-$searchQuery = isset($_GET['search']) ? $_GET['search'] : '';
-$whereClause = '';
-if ($searchQuery) {
-    $whereClause = "WHERE email LIKE :search OR message LIKE :search";
-}
-
-// Query to fetch inquiries with pagination and search
-$stmt = $pdo->prepare("SELECT * FROM inquiry $whereClause ORDER BY created_at DESC LIMIT $limit OFFSET $offset");
-if ($searchQuery) {
-    $stmt->bindValue(':search', "%$searchQuery%");
-}
-$stmt->execute();
-$inquiries = $stmt->fetchAll();
-
-// Query to get the total number of inquiries (for pagination)
-$totalStmt = $pdo->prepare("SELECT COUNT(*) FROM inquiry $whereClause");
-if ($searchQuery) {
-    $totalStmt->bindValue(':search', "%$searchQuery%");
-}
-$totalStmt->execute();
-$totalInquiries = $totalStmt->fetchColumn();
-$totalPages = ceil($totalInquiries / $limit);
+// Get all users who have messaged this admin
+$stmt = $pdo->prepare("
+    SELECT DISTINCT u.id, u.username 
+    FROM users u
+    INNER JOIN messages m ON (m.sender_id = u.id OR m.receiver_id = u.id)
+    WHERE (m.sender_id = ? OR m.receiver_id = ?) AND u.role != 'admin'
+    ORDER BY u.username
+");
+$stmt->execute([$user_id, $user_id]);
+$users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -54,177 +25,240 @@ $totalPages = ceil($totalInquiries / $limit);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notification List</title>
+    <title>Admin Chat - City of Koronadal Public Library</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
     <style>
-        /* Flexbox Layout to keep footer at the bottom */
-        html, body {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        body {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        main {
-            flex-grow: 1;
-        }
-
-        .notification-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .notification-card {
+        .chat-container {
+            max-width: 800px;
+            margin: 20px kundeauto;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 5px;
             padding: 15px;
-            border-radius: 10px;
-            background-color: #fff;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            cursor: pointer;
         }
-
-        .notification-card:hover {
-            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
-            transform: translateY(-5px);
+        .users-list {
+            height: 500px;
+            overflow-y: auto;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-right: 1px solid #ccc;
         }
-
-        .notification-card.read {
-            background-color: #f5f5f5;
-            opacity: 0.6;
+        .chat-box {
+            height: 500px;
+            overflow-y: auto;
+            padding: 15px;
         }
-
-        .notification-card .close-btn {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            font-size: 16px;
-            color: #888;
-            cursor: pointer;
+        .message-input {
+            width: 100%;
+            min-height: 100px;
         }
+        .message-me { 
+            text-align: right;
+            color: #007bff;
+        }
+        .message-user {
+            text-align: left;
+            color: #333;
+        }
+    </style>
 
-        .notification-card .close-btn:hover {
-            color: #000;
+<style>
+        .chat-container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 5px;
+            padding: 15px;
+        }
+        .admins-list {
+            height: 500px;
+            overflow-y: auto;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-right: 1px solid #ccc;
+        }
+        .chat-box {
+            height: 500px;
+            overflow-y: auto;
+            padding: 15px;
+        }
+        .message-input {
+            width: 100%;
+            min-height: 100px;
+        }
+        .message-me { 
+            text-align: right;
+            color: #007bff;
+        }
+        .message-admin {
+            text-align: left;
+            color: #333;
+        }
+        .success-message {
+            background-color: rgba(40, 167, 69, 0.95);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .header-modern {
+            background: linear-gradient(90deg, #1a2526 0%, #2c3e50 100%);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .header-logo {
+            height: 100px;
+            width: 100px;
+        }
+        .header-title {
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .nav-link {
+            font-size: 1.25rem;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+        .nav-link:hover {
+            color: #00ddeb;
+            transform: translateY(-2px);
+            display: inline-block;
+        }
+        .fa-bell {
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+        .nav-link:hover .fa-bell {
+            transform: scale(1.1);
+        }
+        .badge {
+            font-size: 0.7rem;
+            padding: 0.25em 0.5em;
         }
     </style>
 </head>
 <body>
-
-<header class="bg-dark text-white py-3">
-    <div class="container d-flex justify-content-between align-items-center">
-        <h1 class="h3 mb-0">Notifications</h1>
-        <nav>
-            <ul class="nav">
-                <li class="nav-item"><a href="admin.php" class="nav-link text-white">Admin</a></li>
-                <li class="nav-item"><a href="logout.php" class="nav-link text-white">Logout</a></li>
-            </ul>
-        </nav>
-    </div>
-</header>
-
-<main class="container my-5">
-    <section class="card shadow-sm p-4">
-        <h2 class="h4 mb-3">All Inquiries</h2>
-
-        <!-- Search Bar -->
-        <form action="notificationlist.php" method="get" class="mb-4">
-            <div class="input-group">
-                <input type="text" name="search" class="form-control" placeholder="Search inquiries..." value="<?php echo htmlspecialchars($searchQuery); ?>">
-                <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i></button>
+    <header class="bg-dark text-white py-3">
+        <div class="container d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                <img src="images/logo.png" alt="Library Logo" class="header-logo me-3">
+                <h1 class="header-title mb-0">City of Koronadal Public Library</h1>
             </div>
-        </form>
+            <nav>
+                <ul class="nav">
+                    <li class="nav-item"><a href="admin.php" class="nav-link text-white">Admin Dashboard</a></li>
+                    <li class="nav-item"><a href="logout.php" class="nav-link text-white">Logout</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
 
-        <?php if (count($inquiries) > 0): ?>
-            <div class="notification-container">
-                <?php foreach ($inquiries as $inquiry): ?>
-                    <div class="notification-card <?php echo $inquiry['open_status'] == 0 ? 'read' : ''; ?>" data-bs-toggle="modal" data-bs-target="#messageModal" onclick="openModal('<?php echo htmlspecialchars($inquiry['email']); ?>', '<?php echo htmlspecialchars($inquiry['message']); ?>')">
-                        <div class="close-btn" onclick="closeNotification(this)">&times;</div>
-                        <strong>Email:</strong> <?php echo htmlspecialchars($inquiry['email']); ?><br>
-                        <strong>Message:</strong> <?php echo substr(htmlspecialchars($inquiry['message']), 0, 50); ?>...
-                        <?php if ($inquiry['open_status'] == 1): ?>
-                            <a href="notificationlist.php?mark_read=<?php echo $inquiry['id']; ?>" class="btn btn-sm btn-success mt-2">Mark as Read</a>
-                        <?php else: ?>
-                            <span class="badge bg-secondary mt-2">Read</span>
-                        <?php endif; ?>
+    <main class="container my-5">
+        <div class="chat-container card shadow-sm">
+            <div class="row g-0">
+                <div class="col-4 users-list">
+                    <h4>Users</h4>
+                    <?php if (empty($users)): ?>
+                        <p>No messages from users yet.</p>
+                    <?php else: ?>
+                        <?php foreach ($users as $user): ?>
+                            <div class="mb-2">
+                                <a href="#" class="text-decoration-none" onclick="selectUser(<?php echo $user['id']; ?>)">
+                                    <?php echo htmlspecialchars($user['username']); ?>
+                                </a>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+                <div class="col-8">
+                    <div class="chat-box" id="chat-box">
+                        <p>Select a user to view conversation.</p>
                     </div>
-                <?php endforeach; ?>
-            </div>
-        <?php else: ?>
-            <p>No inquiries available.</p>
-        <?php endif; ?>
-
-        <!-- Pagination -->
-        <nav aria-label="Page navigation">
-            <ul class="pagination justify-content-center mt-4">
-                <li class="page-item <?php echo $page == 1 ? 'disabled' : ''; ?>">
-                    <a class="page-link" href="?page=<?php echo max(1, $page - 1); ?>&search=<?php echo urlencode($searchQuery); ?>">Previous</a>
-                </li>
-                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                    <li class="page-item <?php echo $i == $page ? 'active' : ''; ?>">
-                        <a class="page-link" href="?page=<?php echo $i; ?>&search=<?php echo urlencode($searchQuery); ?>"><?php echo $i; ?></a>
-                    </li>
-                <?php endfor; ?>
-                <li class="page-item <?php echo $page == $totalPages ? 'disabled' : ''; ?>">
-                    <a class="page-link" href="?page=<?php echo min($totalPages, $page + 1); ?>&search=<?php echo urlencode($searchQuery); ?>">Next</a>
-                </li>
-            </ul>
-        </nav>
-
-    </section>
-</main>
-
-<!-- Modal for displaying the message -->
-<div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="messageModalLabel">Inquiry Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="text" class="form-control" id="email" readonly>
-                    </div>
-                    <div class="mb-3">
-                        <label for="message" class="form-label">Message</label>
-                        <textarea class="form-control" id="message" rows="5" readonly></textarea>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <form id="message-form" class="p-3">
+                        <input type="hidden" id="receiver_id" name="receiver_id">
+                        <div class="mb-3">
+                            <textarea id="message" name="message" class="form-control message-input" placeholder="Type your message..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Send</button>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
-</div>
+    </main>
 
-<footer class="bg-dark text-white text-center py-3 mt-4">
-    <p class="mb-0">© 2025 City of Koronadal Public Library</p>
-</footer>
+    <footer class="bg-dark text-white text-center py-3 mt-4">
+        <p class="mb-0">© 2025 City of Koronadal Public Library</p>
+    </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    // Close Notification Card
-    function closeNotification(element) {
-        element.closest('.notification-card').style.display = 'none';
-    }
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        let selectedUser = null;
+        let lastMessageId = 0;
 
-    // Open Modal and populate with inquiry details
-    function openModal(email, message) {
-        document.getElementById('email').value = email;
-        document.getElementById('message').value = message;
-    }
-</script>
+        function selectUser(userId) {
+            selectedUser = userId;
+            $("#receiver_id").val(userId);
+            $("#chat-box").empty();
+            lastMessageId = 0;
+            loadMessages();
+        }
 
+        function loadMessages() {
+            if (!selectedUser) return;
+
+            $.ajax({
+                url: 'get_messages.php',
+                method: 'POST',
+                data: {
+                    receiver_id: selectedUser,
+                    last_id: lastMessageId
+                },
+                success: function(data) {
+                    let messages = JSON.parse(data);
+                    messages.forEach(function(msg) {
+                        let messageClass = msg.sender_id == <?php echo $user_id; ?> ? 'message-me' : 'message-user';
+                        $("#chat-box").append(
+                            '<div class="' + messageClass + '">' +
+                            '<strong>' + (msg.sender_id == <?php echo $user_id; ?> ? 'Me' : 'User') + ':</strong> ' + 
+                            msg.message + 
+                            '<br><small>' + msg.timestamp + '</small>' +
+                            '</div><hr>'
+                        );
+                        lastMessageId = Math.max(lastMessageId, msg.id);
+                    });
+                    $("#chat-box").scrollTop($("#chat-box")[0].scrollHeight);
+                }
+            });
+        }
+
+        $("#message-form").submit(function(e) {
+            e.preventDefault();
+            if (!selectedUser) {
+                alert("Please select a user to chat with");
+                return;
+            }
+
+            $.ajax({
+                url: 'send_message.php',
+                method: 'POST',
+                data: {
+                    receiver_id: selectedUser,
+                    message: $("#message").val()
+                },
+                success: function() {
+                    $("#message").val('');
+                    loadMessages();
+                }
+            });
+        });
+
+        // Auto-refresh messages every 2 seconds
+        setInterval(loadMessages, 2000);
+    </script>
 </body>
 </html>
