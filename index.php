@@ -312,6 +312,7 @@ include 'config.php';
                         <!-- OPAC address http://215.119.1.190/ --> 
                         
                         <li class="nav-item"><a href="http://61.245.13.173:7500" class="nav-link text-white">OPAC</a></li>
+                        <li class="nav-item"><a href="about_us.php" class="nav-link text-white">About Us</a></li>
 
                         <?php if(isset($_SESSION['user_id'])): ?>
     <li class="nav-item"><a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#contactModal">Contact</a></li>
@@ -357,25 +358,26 @@ include 'config.php';
             </div>
         <?php endif; ?>
 
-        <!-- About Section -->
+        <!-- About Section
         <section class="about-section">
             <div class="about-content">
                 <h2>About Our Library</h2>
                 <p>We provide a wide range of digital resources, books, and documents for all ages and interests. Whether you're a student, professional, or a hobbyist, our library is the perfect place for you to expand your knowledge.</p>
             </div>
-        </section>
+        </section>-->
 
         <!-- Divider and Contact Info Section -->
         <div class="divider"></div>
-        <div class="contact-info">
-            <h2>Contact Us</h2>
-            <p>If you have any questions or need assistance, please feel free to contact us:</p>
-            <ul>
-                <li>Email: <a href="mailto:koronadal.library@example.com">koronadal.library@example.com</a></li>
-                <li>Phone: +63 123 456 7890</li>
-                <li>Address: City of Koronadal Public Library, Koronadal City, South Cotabato</li>
-            </ul>
-        </div>
+<div class="contact-info">
+    <h2>Contact Us</h2>
+    <p>If you have any questions or need assistance, please feel free to contact us:</p>
+    <ul>
+        <li>Email: <a href="mailto:city.of.koronadal.library@gmail.com">city.of.koronadal.library@gmail.com</a></li>
+        <li>Phone: (083) 825 5503</li>
+        <li>Address: Old City Hall Building, Gensan Drive corner Morales Avenue (Roundball), Poblacion Zone II, Koronadal, Philippines, 9506</li>
+        <li>Facebook: <a href="https://www.facebook.com/KorCityLib" target="_blank">KorCityLib</a></li>
+    </ul>
+</div>
     </main>
 
     <!-- Login Modal -->

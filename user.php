@@ -154,6 +154,51 @@ $notification_count = $stmt_notifications->fetchColumn();
             transform: translateY(-2px);
             display: inline-block;
         }
+
+                /* Contact Info Section */
+                .contact-info {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 40px 0;
+            text-align: center;
+            border-radius: 10px;
+            margin: 0 auto 3rem auto;
+            max-width: 800px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .contact-info h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .contact-info ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .contact-info ul li {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        .contact-info ul li a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .contact-info ul li a:hover {
+            text-decoration: underline;
+        }
+
+        /* Divider */
+        .divider {
+            width: 80%;
+            height: 2px;
+            background-color: #ccc;
+            margin: 3rem auto;
+        }
     </style>
 </head>
 <body>
@@ -298,17 +343,18 @@ $notification_count = $stmt_notifications->fetchColumn();
     </div>
 
     <!-- Contact Info Div -->
-    <div class="contact-info bg-light py-4">
-        <div class="container">
-            <h2 class="h4 mb-3">Contact Us</h2>
-            <p>If you have any questions or need assistance, please feel free to contact us:</p>
-            <ul class="list-unstyled">
-                <li class="mb-2">Email: <a href="mailto:koronadal.library@example.com">koronadal.library@example.com</a></li>
-                <li class="mb-2">Phone: +63 123 456 7890</li>
-                <li class="mb-2">Address: City of Koronadal Public Library, Koronadal City, South Cotabato</li>
-            </ul>
-        </div>
-    </div>
+    <div class="divider"></div>
+<div class="contact-info">
+    <h2>Contact Us</h2>
+    <p>If you have any questions or need assistance, please feel free to contact us:</p>
+    <ul>
+        <li>Email: <a href="mailto:city.of.koronadal.library@gmail.com">city.of.koronadal.library@gmail.com</a></li>
+        <li>Phone: (083) 825 5503</li>
+        <li>Address: Old City Hall Building, Gensan Drive corner Morales Avenue (Roundball), Poblacion Zone II, Koronadal, Philippines, 9506</li>
+        <li>Facebook: <a href="https://www.facebook.com/KorCityLib" target="_blank">KorCityLib</a></li>
+    </ul>
+</div>
+
 
     <footer class="bg-dark text-white text-center py-3 mt-4">
         <p class="mb-0">© 2025 City of Koronadal Public Library</p>
