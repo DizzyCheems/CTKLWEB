@@ -241,7 +241,7 @@ include 'config.php';
                 </h2>
                 <div id="collapseHours" class="accordion-collapse collapse" aria-labelledby="headingHours" data-bs-parent="#aboutAccordion">
                     <div class="accordion-body d-flex justify-content-center">
-                        <img src="images/schedule.png" alt="Library Schedule" class="schedule-img">
+                        <img src="images/schedules.png" alt="Library Schedule" class="schedule-img">
                     </div>
                 </div>
             </div>
