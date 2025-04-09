@@ -18,10 +18,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($stmt->fetchColumn() > 0) {
             $error = "Email already registered";
         } else {
-            // Hash the password and insert new user
-            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+            // Store the password as plain text and insert new user
             $stmt = $pdo->prepare("INSERT INTO users (username, password, role) VALUES (?, ?, 'user')");
-            $stmt->execute([$email, $hashed_password]);
+            $stmt->execute([$email, $password]); // Store password as plain text
             header("Location: index.php?signup_success=You have successfully registered! You can now login.");
             exit;
         }

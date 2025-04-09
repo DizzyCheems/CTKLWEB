@@ -417,9 +417,10 @@ include 'config.php';
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Email: <a href="mailto:koronadal.library@example.com">koronadal.library@example.com</a></p>
-                <p>Phone: +63 123 456 7890</p>
-                <p>Address: City of Koronadal Public Library, Koronadal City, South Cotabato</p>
+            <p>Email: <a href="mailto:city.of.koronadal.library@gmail.com">city.of.koronadal.library@gmail.com</a></p>
+<p>Phone: (083) 825 5503</p>
+<p>Address: Old City Hall Building, Gensan Drive corner Morales Avenue (Roundball), Poblacion Zone II, Koronadal, Philippines, 9506</p>
+<p>Facebook: <a href="https://www.facebook.com/KorCityLib" target="_blank">KorCityLib</a></p>
                 <form id="inquiryForm" method="POST" action="submit_inquiry.php">
                     <div class="mb-3">
                         <label for="email" class="form-label">Your Email</label>
