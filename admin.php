@@ -10,8 +10,8 @@ $alert = null;
 
 // Handle PDF Upload (Create)
 if (isset($_POST['upload'])) {
-    $target_dir = "uploads/";
-    $preview_dir = "uploads/previews/";
+    $target_dir = "Uploads/";
+    $preview_dir = "Uploads/previews/";
     if (!file_exists($target_dir)) mkdir($target_dir, 0777, true);
     if (!file_exists($preview_dir)) mkdir($preview_dir, 0777, true);
 
@@ -49,7 +49,7 @@ if (isset($_POST['delete'])) {
     $file = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($file) {
-        $pdf_path = "uploads/" . $file['filename'];
+        $pdf_path = "Uploads/" . $file['filename'];
         $preview_path = $file['preview_image'];
 
         if (file_exists($pdf_path)) unlink($pdf_path);
@@ -76,11 +76,11 @@ if (isset($_POST['update'])) {
     $file = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($file) {
-        $old_pdf_path = "uploads/" . $file['filename'];
-        $new_pdf_path = "uploads/" . $new_filename;
+        $old_pdf_path = "Uploads/" . $file['filename'];
+        $new_pdf_path = "Uploads/" . $new_filename;
         $old_preview_path = $file['preview_image'];
         $new_preview_filename = pathinfo($new_filename, PATHINFO_FILENAME) . '.png';
-        $new_preview_path = "uploads/previews/" . $new_preview_filename;
+        $new_preview_path = "Uploads/previews/" . $new_preview_filename;
 
         if (file_exists($old_pdf_path)) rename($old_pdf_path, $new_pdf_path);
         if ($old_preview_path && file_exists($old_preview_path)) rename($old_preview_path, $new_preview_path);
@@ -129,7 +129,8 @@ for ($i = 6; $i >= 0; $i--) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Added Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         body {
             background-image: url('images/hallway.jpg');
@@ -202,6 +203,22 @@ for ($i = 6; $i >= 0; $i--) {
             margin: auto;
             height: 400px;
             width: 100%;
+        }
+        .btn-export {
+            background-color: #3498db;
+            color: white;
+            font-weight: 600;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+        .btn-export:hover {
+            background-color: #2980b9;
+        }
+        .export-button-container {
+            text-align: center;
         }
     </style>
 </head>
@@ -284,6 +301,9 @@ for ($i = 6; $i >= 0; $i--) {
                         <canvas id="dailyTrafficChart"></canvas>
                     </div>
                 </div>
+            </div>
+            <div class="export-button-container">
+                <button class="btn-export" onclick="exportCharts()">Export Charts to PDF</button>
             </div>
         </section>
 
@@ -461,7 +481,7 @@ for ($i = 6; $i >= 0; $i--) {
         // Chart.js Scripts
         // 1. Monthly User Visits Chart
         const monthlyVisitsCtx = document.getElementById('monthlyVisitsChart').getContext('2d');
-        new Chart(monthlyVisitsCtx, {
+        const monthlyChart = new Chart(monthlyVisitsCtx, {
             type: 'bar',
             data: {
                 labels: <?php echo json_encode(array_keys($monthlyVisits)); ?>,
@@ -482,7 +502,7 @@ for ($i = 6; $i >= 0; $i--) {
 
         // 2. Daily User Traffic Chart
         const dailyTrafficCtx = document.getElementById('dailyTrafficChart').getContext('2d');
-        new Chart(dailyTrafficCtx, {
+        const dailyChart = new Chart(dailyTrafficCtx, {
             type: 'line',
             data: {
                 labels: <?php echo json_encode(array_keys($dailyTraffic)); ?>,
@@ -500,6 +520,34 @@ for ($i = 6; $i >= 0; $i--) {
                 }
             }
         });
+
+        // jsPDF Export Function for Both Charts
+        function exportCharts() {
+            const monthlyCanvas = document.getElementById('monthlyVisitsChart');
+            const dailyCanvas = document.getElementById('dailyTrafficChart');
+            const monthlyImgData = monthlyCanvas.toDataURL('image/png');
+            const dailyImgData = dailyCanvas.toDataURL('image/png');
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+
+            // Page 1: Monthly User Visits
+            pdf.setFontSize(18);
+            pdf.text('Monthly User Visits Report', 20, 20);
+            pdf.addImage(monthlyImgData, 'PNG', 20, 30, 170, 100);
+            pdf.setFontSize(10);
+            pdf.text('City of Koronadal Public Library - Report Generated on ' + new Date().toLocaleDateString(), 20, 280);
+
+            // Page 2: Daily User Traffic
+            pdf.addPage();
+            pdf.setFontSize(18);
+            pdf.text('Daily User Traffic Report', 20, 20);
+            pdf.addImage(dailyImgData, 'PNG', 20, 30, 170, 100);
+            pdf.setFontSize(10);
+            pdf.text('City of Koronadal Public Library - Report Generated on ' + new Date().toLocaleDateString(), 20, 280);
+
+            // Save PDF
+            pdf.save('Library_Analytics_Report.pdf');
+        }
     </script>
 </body>
 </html>

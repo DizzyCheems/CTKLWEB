@@ -135,8 +135,8 @@ include 'config.php';
             background-repeat: no-repeat;
             background-attachment: fixed;
             padding: 2rem 0;
-            min-height: 100vh;
             position: relative;
+            padding-bottom: 4rem; /* Added to ensure space before footer */
         }
 
         /* Success Message Styling */
@@ -145,13 +145,13 @@ include 'config.php';
             margin: 1rem auto;
             padding: 1rem 1.5rem;
             font-size: 1.1rem;
-            background-color: rgba(40, 167, 69, 0.95); /* Green with slight transparency */
+            background-color: rgba(40, 167, 69, 0.95);
             color: white;
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             text-align: center;
             position: fixed;
-            top: 80px; /* Below navbar */
+            top: 80px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 1000;
@@ -184,13 +184,41 @@ include 'config.php';
             color: #555;
         }
 
+        /* FAQ Section */
+        .faq-section {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 40px 0;
+            text-align: left;
+            border-radius: 10px;
+            margin: 0 auto 2rem auto;
+            max-width: 800px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .faq-section h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .faq-section .accordion-button {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .faq-section .accordion-body {
+            font-size: 1rem;
+            color: #555;
+        }
+
         /* Contact Info Section */
         .contact-info {
             background-color: rgba(255, 255, 255, 0.9);
             padding: 40px 0;
             text-align: center;
             border-radius: 10px;
-            margin: 0 auto 3rem auto;
+            margin: 0 auto 2rem auto;
             max-width: 800px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
@@ -226,7 +254,7 @@ include 'config.php';
             width: 80%;
             height: 2px;
             background-color: #ccc;
-            margin: 3rem auto;
+            margin: 2rem auto;
         }
 
         /* Modal */
@@ -309,15 +337,11 @@ include 'config.php';
                 <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                     <ul class="navbar-nav">
                         <li class="nav-item"><a href="index.php" class="nav-link">Home</a></li>
-                        <!-- OPAC address http://215.119.1.190/ --> 
-                        
                         <li class="nav-item"><a href="http://61.245.13.173:7500" class="nav-link text-white">OPAC</a></li>
                         <li class="nav-item"><a href="about_us.php" class="nav-link text-white">About Us</a></li>
-
                         <?php if(isset($_SESSION['user_id'])): ?>
-    <li class="nav-item"><a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#contactModal">Contact</a></li>
-<?php endif; ?>
-
+                            <li class="nav-item"><a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#contactModal">Contact</a></li>
+                        <?php endif; ?>
                         <?php if (!isset($_SESSION['user_id'])): ?>
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="authDropdown" 
@@ -358,26 +382,86 @@ include 'config.php';
             </div>
         <?php endif; ?>
 
-        <!-- About Section
-        <section class="about-section">
-            <div class="about-content">
-                <h2>About Our Library</h2>
-                <p>We provide a wide range of digital resources, books, and documents for all ages and interests. Whether you're a student, professional, or a hobbyist, our library is the perfect place for you to expand your knowledge.</p>
-            </div>
-        </section>-->
-
-        <!-- Divider and Contact Info Section -->
+        <!-- Divider before FAQ -->
         <div class="divider"></div>
-<div class="contact-info">
-    <h2>Contact Us</h2>
-    <p>If you have any questions or need assistance, please feel free to contact us:</p>
-    <ul>
-        <li>Email: <a href="mailto:city.of.koronadal.library@gmail.com">city.of.koronadal.library@gmail.com</a></li>
-        <li>Phone: (083) 825 5503</li>
-        <li>Address: Old City Hall Building, Gensan Drive corner Morales Avenue (Roundball), Poblacion Zone II, Koronadal, Philippines, 9506</li>
-        <li>Facebook: <a href="https://www.facebook.com/KorCityLib" target="_blank">KorCityLib</a></li>
-    </ul>
-</div>
+
+        <!-- FAQ Section -->
+        <section class="faq-section">
+            <h2>Frequently Asked Questions</h2>
+            <div class="accordion" id="faqAccordion">
+                <div class="accordion-item">
+                    <h3 class="accordion-header" id="faqHeading1">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" 
+                                data-bs-target="#faqCollapse1" aria-expanded="true" aria-controls="faqCollapse1">
+                            How do I become a member of the library?
+                        </button>
+                    </h3>
+                    <div id="faqCollapse1" class="accordion-collapse collapse show" aria-labelledby="faqHeading1" 
+                         data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            To become a member, click the "Join Now" button on the homepage or visit the "Sign Up" page to create an account. Follow the instructions to complete your registration.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h3 class="accordion-header" id="faqHeading2">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                data-bs-target="#faqCollapse2" aria-expanded="false" aria-controls="faqCollapse2">
+                            What resources are available at the library?
+                        </button>
+                    </h3>
+                    <div id="faqCollapse2" class="accordion-collapse collapse" aria-labelledby="faqHeading2" 
+                         data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            We offer a wide range of digital resources, books, and documents for all ages and interests. You can access our Online Public Access Catalog (OPAC) to explore our collection.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h3 class="accordion-header" id="faqHeading3">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                data-bs-target="#faqCollapse3" aria-expanded="false" aria-controls="faqCollapse3">
+                            How can I contact the library for assistance?
+                        </button>
+                    </h3>
+                    <div id="faqCollapse3" class="accordion-collapse collapse" aria-labelledby="faqHeading3" 
+                         data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            You can reach us via email at <a href="mailto:city.of.koronadal.library@gmail.com">city.of.koronadal.library@gmail.com</a>, call us at (083) 825 5503, or visit our Contact Us section for more details.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h3 class="accordion-header" id="faqHeading4">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                data-bs-target="#faqCollapse4" aria-expanded="false" aria-controls="faqCollapse4">
+                            Are there any fees for using the library?
+                        </button>
+                    </h3>
+                    <div id="faqCollapse4" class="accordion-collapse collapse" aria-labelledby="faqHeading4" 
+                         data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Membership and access to most of our resources are free. Some services may have minimal fees; please contact us for specific details.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Divider before Contact -->
+        <div class="divider"></div>
+
+        <!-- Contact Info Section -->
+        <div class="contact-info">
+            <h2>Contact Us</h2>
+            <p>If you have any questions or need assistance, please feel free to contact us:</p>
+            <ul>
+                <li>Email: <a href="mailto:city.of.koronadal.library@gmail.com">city.of.koronadal.library@gmail.com</a></li>
+                <li>Phone: (083) 825 5503</li>
+                <li>Address: Old City Hall Building, Gensan Drive corner Morales Avenue (Roundball), Poblacion Zone II, Koronadal, Philippines, 9506</li>
+                <li>Facebook: <a href="https://www.facebook.com/KorCityLib" target="_blank">KorCityLib</a></li>
+            </ul>
+        </div>
     </main>
 
     <!-- Login Modal -->
@@ -408,51 +492,51 @@ include 'config.php';
         </div>
     </div>
 
-<!-- Contact Modal -->
-<div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="contactModalLabel">Contact Us</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-            <p>Email: <a href="mailto:city.of.koronadal.library@gmail.com">city.of.koronadal.library@gmail.com</a></p>
-<p>Phone: (083) 825 5503</p>
-<p>Address: Old City Hall Building, Gensan Drive corner Morales Avenue (Roundball), Poblacion Zone II, Koronadal, Philippines, 9506</p>
-<p>Facebook: <a href="https://www.facebook.com/KorCityLib" target="_blank">KorCityLib</a></p>
-                <form id="inquiryForm" method="POST" action="submit_inquiry.php">
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Your Email</label>
-                        <?php
-                        // Fetch user's email from the database if logged in
-                        if (isset($_SESSION['user_id'])) {
-                            $stmt = $pdo->prepare("SELECT email FROM users WHERE id = ?");
-                            $stmt->execute([$_SESSION['user_id']]);
-                            $user_email = $stmt->fetchColumn();
-                            // If email is NULL, allow user to input it
-                            if ($user_email === false || $user_email === null) {
-                                $user_email = '';
+    <!-- Contact Modal -->
+    <div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="contactModalLabel">Contact Us</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Email: <a href="mailto:city.of.koronadal.library@gmail.com">city.of.koronadal.library@gmail.com</a></p>
+                    <p>Phone: (083) 825 5503</p>
+                    <p>Address: Old City Hall Building, Gensan Drive corner Morales Avenue (Roundball), Poblacion Zone II, Koronadal, Philippines, 9506</p>
+                    <p>Facebook: <a href="https://www.facebook.com/KorCityLib" target="_blank">KorCityLib</a></p>
+                    <form id="inquiryForm" method="POST" action="submit_inquiry.php">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Your Email</label>
+                            <?php
+                            // Fetch user's email from the database if logged in
+                            if (isset($_SESSION['user_id'])) {
+                                $stmt = $pdo->prepare("SELECT email FROM users WHERE id = ?");
+                                $stmt->execute([$_SESSION['user_id']]);
+                                $user_email = $stmt->fetchColumn();
+                                // If email is NULL, allow user to input it
+                                if ($user_email === false || $user_email === null) {
+                                    $user_email = '';
+                                }
                             }
-                        }
-                        ?>
-                        <input type="email" class="form-control" id="email" name="email" 
-                               value="<?php echo htmlspecialchars($user_email ?? ''); ?>" 
-                               <?php echo isset($_SESSION['user_id']) && $user_email !== '' ? 'readonly' : ''; ?> required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="message" class="form-label">Your Message</label>
-                        <textarea class="form-control" id="message" name="message" rows="3" required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Submit Inquiry</button>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            ?>
+                            <input type="email" class="form-control" id="email" name="email" 
+                                   value="<?php echo htmlspecialchars($user_email ?? ''); ?>" 
+                                   <?php echo isset($_SESSION['user_id']) && $user_email !== '' ? 'readonly' : ''; ?> required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Your Message</label>
+                            <textarea class="form-control" id="message" name="message" rows="3" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit Inquiry</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
     <!-- Footer -->
     <footer>
