@@ -287,25 +287,45 @@ for ($i = 6; $i >= 0; $i--) {
     <main class="container my-5">
         <!-- User Analytics Section with Charts -->
         <section class="card shadow-sm p-4 mb-4">
-            <h2 class="h4 mb-3">User Analytics</h2>
-            <div class="row">
-                <div class="col-md-6">
-                    <h5>Monthly User Visits (Last 12 Months)</h5>
-                    <div class="chart-container">
-                        <canvas id="monthlyVisitsChart"></canvas>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <h5>Daily User Traffic (Last 7 Days)</h5>
-                    <div class="chart-container">
-                        <canvas id="dailyTrafficChart"></canvas>
-                    </div>
-                </div>
+    <h2 class="h4 mb-3">User Analytics</h2>
+    <!-- Date Range Filters -->
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <label for="dateFrom" class="form-label">Date From</label>
+            <input type="date" class="form-control" id="dateFrom" name="dateFrom">
+        </div>
+        <div class="col-md-4">
+            <label for="dateTo" class="form-label">Date To</label>
+            <input type="date" class="form-control" id="dateTo" name="dateTo">
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+            <button class="btn btn-primary w-100" id="filterButton">Filter</button>
+        </div>
+    </div>
+
+    <!-- Tabbed Layout -->
+    <ul class="nav nav-tabs" id="analyticsTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="monthlyVisits-tab" data-bs-toggle="tab" data-bs-target="#monthlyVisits" type="button" role="tab" aria-controls="monthlyVisits" aria-selected="true">Monthly Visits</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="dailyTraffic-tab" data-bs-toggle="tab" data-bs-target="#dailyTraffic" type="button" role="tab" aria-controls="dailyTraffic" aria-selected="false">Daily Traffic</button>
+        </li>
+    </ul>
+    <div class="tab-content mt-3" id="analyticsTabsContent">
+        <div class="tab-pane fade show active" id="monthlyVisits" role="tabpanel" aria-labelledby="monthlyVisits-tab">
+            <div class="chart-container">
+                <canvas id="monthlyVisitsChart"></canvas>
             </div>
-            <div class="export-button-container">
-                <button class="btn-export" onclick="exportCharts()">Export Charts to PDF</button>
+        </div>
+        <div class="tab-pane fade" id="dailyTraffic" role="tabpanel" aria-labelledby="dailyTraffic-tab">
+            <div class="chart-container">
+                <canvas id="dailyTrafficChart"></canvas>
             </div>
-        </section>
+        </div>
+    </div>
+</section>
+
 
         <section class="card shadow-sm p-4">
             <h2 class="h4 mb-3">Upload PDF</h2>
@@ -549,5 +569,75 @@ for ($i = 6; $i >= 0; $i--) {
             pdf.save('Library_Analytics_Report.pdf');
         }
     </script>
+
+
+<script>
+    document.getElementById('filterButton').addEventListener('click', function () {
+        const dateFrom = document.getElementById('dateFrom').value;
+        const dateTo = document.getElementById('dateTo').value;
+
+        if (!dateFrom || !dateTo) {
+            alert('Please select both Date From and Date To.');
+            return;
+        }
+
+        // Fetch filtered data and update charts
+        fetch(`fetch_analytics.php?dateFrom=${dateFrom}&dateTo=${dateTo}`)
+            .then(response => response.json())
+            .then(data => {
+                // Update Monthly Visits Chart
+                monthlyChart.data.labels = data.monthly.labels;
+                monthlyChart.data.datasets[0].data = data.monthly.data;
+                monthlyChart.update();
+
+                // Update Daily Traffic Chart
+                dailyChart.data.labels = data.daily.labels;
+                dailyChart.data.datasets[0].data = data.daily.data;
+                dailyChart.update();
+            })
+            .catch(error => console.error('Error fetching analytics data:', error));
+    });
+
+    // Chart initialization code (unchanged)
+    const monthlyVisitsCtx = document.getElementById('monthlyVisitsChart').getContext('2d');
+    const monthlyChart = new Chart(monthlyVisitsCtx, {
+        type: 'bar',
+        data: {
+            labels: <?php echo json_encode(array_keys($monthlyVisits)); ?>,
+            datasets: [{
+                label: 'User Visits',
+                data: <?php echo json_encode(array_values($monthlyVisits)); ?>,
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+    const dailyTrafficCtx = document.getElementById('dailyTrafficChart').getContext('2d');
+    const dailyChart = new Chart(dailyTrafficCtx, {
+        type: 'line',
+        data: {
+            labels: <?php echo json_encode(array_keys($dailyTraffic)); ?>,
+            datasets: [{
+                label: 'Daily Traffic',
+                data: <?php echo json_encode(array_values($dailyTraffic)); ?>,
+                fill: false,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+</script>
 </body>
 </html>
