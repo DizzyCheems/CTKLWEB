@@ -320,6 +320,48 @@ include 'config.php';
             .navbar-brand { font-size: 1rem; }
         }
     </style>
+
+<style>
+        /* Additional styling for new sections */
+        .section-title {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .updates-list, .databases-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .updates-list li, .databases-list li {
+            margin-bottom: 10px;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .updates-list li h5, .databases-list li h5 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 500;
+        }
+
+        .updates-list li small, .databases-list li p {
+            color: #555;
+        }
+
+        .databases-list li a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .databases-list li a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
     <!-- Header -->
@@ -448,6 +490,56 @@ include 'config.php';
             </div>
         </section>
 
+
+
+        <!-- What's New in the Library Section -->
+        <section class="container my-5">
+            <h2 class="section-title">What's New in the Library</h2>
+            <ul class="updates-list">
+                <?php if (!empty($libraryUpdates)): ?>
+                    <?php foreach ($libraryUpdates as $update): ?>
+                        <li>
+                            <h5><?php echo htmlspecialchars($update['title']); ?></h5>
+                            <small><?php echo date('F j, Y', strtotime($update['date'])); ?></small>
+                            <p><?php echo htmlspecialchars($update['description']); ?></p>
+                        </li>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <li>No updates available at the moment. Please check back later!</li>
+                <?php endif; ?>
+            </ul>
+        </section>
+
+        <!-- Divider -->
+        <div class="divider"></div>
+
+<!-- Top 5 Free Online Library Databases Section -->
+<section class="container my-5">
+    <h2 class="section-title">Top 5 Free Online Library Databases</h2>
+    <ul class="databases-list">
+        <li>
+            <h5><a href="https://www.worldcat.org/" target="_blank">WorldCat</a></h5>
+            <p>A global catalog of library collections, providing access to millions of books, articles, and multimedia resources.</p>
+        </li>
+        <li>
+            <h5><a href="https://www.doaj.org/" target="_blank">Directory of Open Access Journals (DOAJ)</a></h5>
+            <p>A community-curated online directory that indexes and provides access to high-quality, open-access, peer-reviewed journals.</p>
+        </li>
+        <li>
+            <h5><a href="https://eric.ed.gov/" target="_blank">ERIC (Education Resources Information Center)</a></h5>
+            <p>A digital library of education-related resources, including research papers, articles, and educational material.</p>
+        </li>
+        <li>
+            <h5><a href="https://www.proquest.com/" target="_blank">ProQuest</a></h5>
+            <p>A platform offering access to a vast collection of dissertations, theses, and academic research across various disciplines.</p>
+        </li>
+        <li>
+            <h5><a href="https://www.gutenberg.org/" target="_blank">Project Gutenberg</a></h5>
+            <p>An extensive collection of free eBooks, including classic literature and works in the public domain.</p>
+        </li>
+    </ul>
+</section>
+
         <!-- Divider before Contact -->
         <div class="divider"></div>
 
@@ -555,5 +647,7 @@ include 'config.php';
             }
         });
     </script>
+
+
 </body>
 </html>

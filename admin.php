@@ -98,8 +98,7 @@ $userCount = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
 $pdfCount = $pdo->query("SELECT COUNT(*) FROM pdf_files")->fetchColumn();
 $loggedInCount = $pdo->query("SELECT COUNT(*) FROM active_sessions WHERE last_active > DATE_SUB(NOW(), INTERVAL 15 MINUTE)")->fetchColumn();
 
-// Data for Charts
-// 1. Monthly User Visits (last 12 months)
+// Data for Charts (default: last 12 months for monthly, last 7 days for daily)
 $monthlyVisits = [];
 for ($i = 11; $i >= 0; $i--) {
     $month = date('Y-m', strtotime("-$i months"));
@@ -108,7 +107,6 @@ for ($i = 11; $i >= 0; $i--) {
     $monthlyVisits[$month] = $stmt->fetchColumn();
 }
 
-// 2. User Traffic (last 7 days)
 $dailyTraffic = [];
 for ($i = 6; $i >= 0; $i--) {
     $day = date('Y-m-d', strtotime("-$i days"));
@@ -116,6 +114,12 @@ for ($i = 6; $i >= 0; $i--) {
     $stmt->execute([$day]);
     $dailyTraffic[$day] = $stmt->fetchColumn();
 }
+
+// User Role Distribution
+$roleDistribution = [];
+$stmt = $pdo->prepare("SELECT role, COUNT(*) as count FROM users GROUP BY role");
+$stmt->execute();
+$roleDistribution = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
 ?>
 
 <!DOCTYPE html>
@@ -202,7 +206,9 @@ for ($i = 6; $i >= 0; $i--) {
             position: relative;
             margin: auto;
             height: 400px;
-            width: 100%;
+            width: 80%;
+            display: flex;
+            justify-content: center;
         }
         .btn-export {
             background-color: #3498db;
@@ -287,45 +293,55 @@ for ($i = 6; $i >= 0; $i--) {
     <main class="container my-5">
         <!-- User Analytics Section with Charts -->
         <section class="card shadow-sm p-4 mb-4">
-    <h2 class="h4 mb-3">User Analytics</h2>
-    <!-- Date Range Filters -->
-    <div class="row mb-3">
-        <div class="col-md-4">
-            <label for="dateFrom" class="form-label">Date From</label>
-            <input type="date" class="form-control" id="dateFrom" name="dateFrom">
-        </div>
-        <div class="col-md-4">
-            <label for="dateTo" class="form-label">Date To</label>
-            <input type="date" class="form-control" id="dateTo" name="dateTo">
-        </div>
-        <div class="col-md-4 d-flex align-items-end">
-            <button class="btn btn-primary w-100" id="filterButton">Filter</button>
-        </div>
-    </div>
-
-    <!-- Tabbed Layout -->
-    <ul class="nav nav-tabs" id="analyticsTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="monthlyVisits-tab" data-bs-toggle="tab" data-bs-target="#monthlyVisits" type="button" role="tab" aria-controls="monthlyVisits" aria-selected="true">Monthly Visits</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="dailyTraffic-tab" data-bs-toggle="tab" data-bs-target="#dailyTraffic" type="button" role="tab" aria-controls="dailyTraffic" aria-selected="false">Daily Traffic</button>
-        </li>
-    </ul>
-    <div class="tab-content mt-3" id="analyticsTabsContent">
-        <div class="tab-pane fade show active" id="monthlyVisits" role="tabpanel" aria-labelledby="monthlyVisits-tab">
-            <div class="chart-container">
-                <canvas id="monthlyVisitsChart"></canvas>
+            <h2 class="h4 mb-3">User Analytics</h2>
+            <!-- Date Range Filters -->
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label for="dateFrom" class="form-label">Date From</label>
+                    <input type="date" class="form-control" id="dateFrom" name="dateFrom">
+                </div>
+                <div class="col-md-4">
+                    <label for="dateTo" class="form-label">Date To</label>
+                    <input type="date" class="form-control" id="dateTo" name="dateTo">
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button class="btn btn-primary w-100" id="filterButton">Filter</button>
+                </div>
             </div>
-        </div>
-        <div class="tab-pane fade" id="dailyTraffic" role="tabpanel" aria-labelledby="dailyTraffic-tab">
-            <div class="chart-container">
-                <canvas id="dailyTrafficChart"></canvas>
-            </div>
-        </div>
-    </div>
-</section>
 
+            <!-- Tabbed Layout -->
+            <ul class="nav nav-tabs" id="analyticsTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="monthlyVisits-tab" data-bs-toggle="tab" data-bs-target="#monthlyVisits" type="button" role="tab" aria-controls="monthlyVisits" aria-selected="true">Monthly Visits</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="dailyTraffic-tab" data-bs-toggle="tab" data-bs-target="#dailyTraffic" type="button" role="tab" aria-controls="dailyTraffic" aria-selected="false">Daily Traffic</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="roleDistribution-tab" data-bs-toggle="tab" data-bs-target="#roleDistribution" type="button" role="tab" aria-controls="roleDistribution" aria-selected="false">Role Distribution</button>
+                </li>
+            </ul>
+            <div class="tab-content mt-3" id="analyticsTabsContent">
+                <div class="tab-pane fade show active" id="monthlyVisits" role="tabpanel" aria-labelledby="monthlyVisits-tab">
+                    <div class="chart-container">
+                        <canvas id="monthlyVisitsChart"></canvas>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="dailyTraffic" role="tabpanel" aria-labelledby="dailyTraffic-tab">
+                    <div class="chart-container">
+                        <canvas id="dailyTrafficChart"></canvas>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="roleDistribution" role="tabpanel" aria-labelledby="roleDistribution-tab">
+                    <div class="chart-container">
+                        <canvas id="roleDistributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="export-button-container">
+                <button class="btn-export" onclick="exportCharts()">Export Charts to PDF</button>
+            </div>
+        </section>
 
         <section class="card shadow-sm p-4">
             <h2 class="h4 mb-3">Upload PDF</h2>
@@ -499,54 +515,137 @@ for ($i = 6; $i >= 0; $i--) {
         });
 
         // Chart.js Scripts
-        // 1. Monthly User Visits Chart
-        const monthlyVisitsCtx = document.getElementById('monthlyVisitsChart').getContext('2d');
-        const monthlyChart = new Chart(monthlyVisitsCtx, {
-            type: 'bar',
-            data: {
-                labels: <?php echo json_encode(array_keys($monthlyVisits)); ?>,
-                datasets: [{
-                    label: 'User Visits',
-                    data: <?php echo json_encode(array_values($monthlyVisits)); ?>,
-                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: { beginAtZero: true }
+        let monthlyChart, dailyChart, roleChart;
+
+        // Initialize Charts
+        function initializeCharts() {
+            const monthlyVisitsCtx = document.getElementById('monthlyVisitsChart').getContext('2d');
+            monthlyChart = new Chart(monthlyVisitsCtx, {
+                type: 'bar',
+                data: {
+                    labels: <?php echo json_encode(array_keys($monthlyVisits)); ?>,
+                    datasets: [{
+                        label: 'User Visits',
+                        data: <?php echo json_encode(array_values($monthlyVisits)); ?>,
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
                 }
+            });
+
+            const dailyTrafficCtx = document.getElementById('dailyTrafficChart').getContext('2d');
+            dailyChart = new Chart(dailyTrafficCtx, {
+                type: 'line',
+                data: {
+                    labels: <?php echo json_encode(array_keys($dailyTraffic)); ?>,
+                    datasets: [{
+                        label: 'Daily Traffic',
+                        data: <?php echo json_encode(array_values($dailyTraffic)); ?>,
+                        fill: false,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+
+            const roleDistributionCtx = document.getElementById('roleDistributionChart').getContext('2d');
+            roleChart = new Chart(roleDistributionCtx, {
+                type: 'pie',
+                data: {
+                    labels: <?php echo json_encode(array_keys($roleDistribution)); ?>,
+                    datasets: [{
+                        label: 'User Roles',
+                        data: <?php echo json_encode(array_values($roleDistribution)); ?>,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.5)',
+                            'rgba(54, 162, 235, 0.5)',
+                            'rgba(255, 206, 86, 0.5)',
+                            'rgba(75, 192, 192, 0.5)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    }
+                }
+            });
+        }
+
+        // Call initializeCharts on page load
+        document.addEventListener('DOMContentLoaded', initializeCharts);
+
+        // Filter Button Event Listener
+        document.getElementById('filterButton').addEventListener('click', function () {
+            const dateFrom = document.getElementById('dateFrom').value;
+            const dateTo = document.getElementById('dateTo').value;
+
+            if (!dateFrom || !dateTo) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Missing Dates',
+                    text: 'Please select both Date From and Date To.',
+                    confirmButtonText: 'OK'
+                });
+                return;
             }
+
+            // Fetch filtered data and update charts
+            fetch(`fetch_analytics.php?dateFrom=${dateFrom}&dateTo=${dateTo}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Update Monthly Visits Chart
+                    monthlyChart.data.labels = data.monthly.labels;
+                    monthlyChart.data.datasets[0].data = data.monthly.data;
+                    monthlyChart.update();
+
+                    // Update Daily Traffic Chart
+                    dailyChart.data.labels = data.daily.labels;
+                    dailyChart.data.datasets[0].data = data.daily.data;
+                    dailyChart.update();
+
+                    // Role Distribution doesn't change with date filter
+                })
+                .catch(error => {
+                    console.error('Error fetching analytics data:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to fetch analytics data.',
+                        confirmButtonText: 'OK'
+                    });
+                });
         });
 
-        // 2. Daily User Traffic Chart
-        const dailyTrafficCtx = document.getElementById('dailyTrafficChart').getContext('2d');
-        const dailyChart = new Chart(dailyTrafficCtx, {
-            type: 'line',
-            data: {
-                labels: <?php echo json_encode(array_keys($dailyTraffic)); ?>,
-                datasets: [{
-                    label: 'Daily Traffic',
-                    data: <?php echo json_encode(array_values($dailyTraffic)); ?>,
-                    fill: false,
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    tension: 0.1
-                }]
-            },
-            options: {
-                scales: {
-                    y: { beginAtZero: true }
-                }
-            }
-        });
-
-        // jsPDF Export Function for Both Charts
+        // jsPDF Export Function for All Charts
         function exportCharts() {
             const monthlyCanvas = document.getElementById('monthlyVisitsChart');
             const dailyCanvas = document.getElementById('dailyTrafficChart');
+            const roleCanvas = document.getElementById('roleDistributionChart');
             const monthlyImgData = monthlyCanvas.toDataURL('image/png');
             const dailyImgData = dailyCanvas.toDataURL('image/png');
+            const roleImgData = roleCanvas.toDataURL('image/png');
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF('p', 'mm', 'a4');
 
@@ -565,79 +664,17 @@ for ($i = 6; $i >= 0; $i--) {
             pdf.setFontSize(10);
             pdf.text('City of Koronadal Public Library - Report Generated on ' + new Date().toLocaleDateString(), 20, 280);
 
+            // Page 3: User Role Distribution
+            pdf.addPage();
+            pdf.setFontSize(18);
+            pdf.text('User Role Distribution Report', 20, 20);
+            pdf.addImage(roleImgData, 'PNG', 20, 30, 170, 100);
+            pdf.setFontSize(10);
+            pdf.text('City of Koronadal Public Library - Report Generated on ' + new Date().toLocaleDateString(), 20, 280);
+
             // Save PDF
             pdf.save('Library_Analytics_Report.pdf');
         }
     </script>
-
-
-<script>
-    document.getElementById('filterButton').addEventListener('click', function () {
-        const dateFrom = document.getElementById('dateFrom').value;
-        const dateTo = document.getElementById('dateTo').value;
-
-        if (!dateFrom || !dateTo) {
-            alert('Please select both Date From and Date To.');
-            return;
-        }
-
-        // Fetch filtered data and update charts
-        fetch(`fetch_analytics.php?dateFrom=${dateFrom}&dateTo=${dateTo}`)
-            .then(response => response.json())
-            .then(data => {
-                // Update Monthly Visits Chart
-                monthlyChart.data.labels = data.monthly.labels;
-                monthlyChart.data.datasets[0].data = data.monthly.data;
-                monthlyChart.update();
-
-                // Update Daily Traffic Chart
-                dailyChart.data.labels = data.daily.labels;
-                dailyChart.data.datasets[0].data = data.daily.data;
-                dailyChart.update();
-            })
-            .catch(error => console.error('Error fetching analytics data:', error));
-    });
-
-    // Chart initialization code (unchanged)
-    const monthlyVisitsCtx = document.getElementById('monthlyVisitsChart').getContext('2d');
-    const monthlyChart = new Chart(monthlyVisitsCtx, {
-        type: 'bar',
-        data: {
-            labels: <?php echo json_encode(array_keys($monthlyVisits)); ?>,
-            datasets: [{
-                label: 'User Visits',
-                data: <?php echo json_encode(array_values($monthlyVisits)); ?>,
-                backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: { beginAtZero: true }
-            }
-        }
-    });
-
-    const dailyTrafficCtx = document.getElementById('dailyTrafficChart').getContext('2d');
-    const dailyChart = new Chart(dailyTrafficCtx, {
-        type: 'line',
-        data: {
-            labels: <?php echo json_encode(array_keys($dailyTraffic)); ?>,
-            datasets: [{
-                label: 'Daily Traffic',
-                data: <?php echo json_encode(array_values($dailyTraffic)); ?>,
-                fill: false,
-                borderColor: 'rgba(75, 192, 192, 1)',
-                tension: 0.1
-            }]
-        },
-        options: {
-            scales: {
-                y: { beginAtZero: true }
-            }
-        }
-    });
-</script>
 </body>
 </html>
