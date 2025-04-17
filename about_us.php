@@ -147,6 +147,63 @@ include 'config.php';
             background-color: #ccc;
             margin: 3rem auto;
         }
+
+       /* Additional styling for new sections */
+       .section-title {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .updates-list, .databases-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .updates-list li, .databases-list li {
+            margin-bottom: 10px;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .updates-list li h5, .databases-list li h5 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 500;
+        }
+
+        .updates-list li small, .databases-list li p {
+            color: #555;
+        }
+
+        .databases-list li a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .databases-list li a:hover {
+            text-decoration: underline;
+        }
+
+        .card {
+    background-color: #f9f9f9; /* Light background color */
+    border: 1px solid #ddd; /* Light border */
+    border-radius: 8px; /* Rounded corners */
+    padding: 20px; /* Padding inside the card */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    max-width: 600px; /* Max width of the card */
+    margin: 20px auto; /* Center the card */
+}
+
+.section-title {
+    font-size: 24px; /* Font size for the title */
+    color: #333; /* Dark text color */
+    margin: 0; /* Remove default margin */
+}
+
     </style>
 </head>
 <body>
@@ -338,6 +395,44 @@ include 'config.php';
         </div>
     </div>
     <?php endif; ?>
+
+
+        <!-- Divider -->
+        <div class="divider"></div>
+
+        <!-- Top 5 Free Online Library Databases Section -->
+        <section class="container my-5">
+ 
+        <div class="card">
+            <h2 class="section-title">Top 5 Free Online Library Databases</h2>
+        </div> 
+            <ul class="databases-list">
+                <li>
+                    <h5><a href="https://www.worldcat.org/" target="_blank">WorldCat</a></h5>
+                    <p>A global catalog of library collections, providing access to millions of books, articles, and multimedia resources.</p>
+                </li>
+                <li>
+                    <h5><a href="https://www.doaj.org/" target="_blank">Directory of Open Access Journals (DOAJ)</a></h5>
+                    <p>A community-curated online directory that indexes and provides access to high-quality, open-access, peer-reviewed journals.</p>
+                </li>
+                <li>
+                    <h5><a href="https://eric.ed.gov/" target="_blank">ERIC (Education Resources Information Center)</a></h5>
+                    <p>A digital library of education-related resources, including research papers, articles, and educational material.</p>
+                </li>
+                <li>
+                    <h5><a href="https://www.proquest.com/" target="_blank">ProQuest</a></h5>
+                    <p>A platform offering access to a vast collection of dissertations, theses, and academic research across various disciplines.</p>
+                </li>
+                <li>
+                    <h5><a href="https://www.gutenberg.org/" target="_blank">Project Gutenberg</a></h5>
+                    <p>An extensive collection of free eBooks, including classic literature and works in the public domain.</p>
+                </li>
+            </ul>
+        </section>
+
+        <!-- Divider before Contact -->
+        <div class="divider"></div>
+
 
     <!-- Contact Us Section -->
     <div class="divider"></div>

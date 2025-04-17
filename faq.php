@@ -7,7 +7,7 @@ include 'config.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>City of Koronadal Public Library</title>
+    <title>FAQs - City of Koronadal Public Library</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
@@ -73,60 +73,6 @@ include 'config.php';
             margin: 0;
         }
 
-        /* Hero Section */
-        .hero-section {
-            position: relative;
-            background: url('images/roundball.png') no-repeat center center;
-            background-size: cover;
-            padding: 100px 0;
-            color: white;
-            text-align: center;
-            min-height: 400px;
-        }
-
-        .hero-section .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.4);
-        }
-
-        .hero-section h1 {
-            font-size: 3rem;
-            font-weight: 600;
-            margin-bottom: 20px;
-            z-index: 2;
-            position: relative;
-        }
-
-        .hero-section p {
-            font-size: 1.25rem;
-            margin-bottom: 40px;
-            z-index: 2;
-            position: relative;
-        }
-
-        .btn-cta {
-            background-color: #f39c12;
-            color: white;
-            font-weight: 600;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 5px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s ease;
-            z-index: 2;
-            position: relative;
-        }
-
-        .btn-cta:hover {
-            background-color: #e67e22;
-        }
-
         /* Main content background image */
         .main-content {
             background-image: url('images/hallway.jpg');
@@ -136,107 +82,35 @@ include 'config.php';
             background-attachment: fixed;
             padding: 2rem 0;
             position: relative;
-            padding-bottom: 4rem; /* Added to ensure space before footer */
+            padding-bottom: 4rem;
         }
 
-        /* Success Message Styling */
-        .success-message {
-            max-width: 600px;
-            margin: 1rem auto;
-            padding: 1rem 1.5rem;
-            font-size: 1.1rem;
-            background-color: rgba(40, 167, 69, 0.95);
-            color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            text-align: center;
-            position: fixed;
-            top: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            animation: fadeInOut 2s ease forwards;
-        }
-
-        @keyframes fadeInOut {
-            0% { opacity: 0; transform: translate(-50%, -20px); }
-            20% { opacity: 1; transform: translate(-50%, 0); }
-            80% { opacity: 1; transform: translate(-50%, 0); }
-            100% { opacity: 0; transform: translate(-50%, -20px); }
-        }
-
-        /* About Section */
-        .about-section {
+        /* FAQ Section */
+        .faq-section {
             background-color: rgba(255, 255, 255, 0.9);
             padding: 40px 0;
-            text-align: center;
-        }
-
-        .about-section h2 {
-            font-weight: 600;
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-        }
-
-        .about-section p {
-            font-size: 1.15rem;
-            line-height: 1.6;
-            color: #555;
-        }
-
-        /* Contact Info Section */
-        .contact-info {
-            background-color: rgba(255, 255, 255, 0.9);
-            padding: 40px 0;
-            text-align: center;
+            text-align: left;
             border-radius: 10px;
-            margin: 0 auto 2rem auto;
+            margin: 2rem auto;
             max-width: 800px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
-        .contact-info h2 {
+        .faq-section h2 {
             font-size: 2rem;
             margin-bottom: 20px;
             font-weight: 600;
+            text-align: center;
         }
 
-        .contact-info ul {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        .contact-info ul li {
+        .faq-section .accordion-button {
             font-size: 1.1rem;
-            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .faq-section .accordion-body {
+            font-size: 1rem;
             color: #555;
-        }
-
-        .contact-info ul li a {
-            color: #3498db;
-            text-decoration: none;
-        }
-
-        .contact-info ul li a:hover {
-            text-decoration: underline;
-        }
-
-        /* Divider */
-        .divider {
-            width: 80%;
-            height: 2px;
-            background-color: #ccc;
-            margin: 2rem auto;
-        }
-
-        /* Modal */
-        .modal-header {
-            background-color: #2c3e50;
-            color: white;
-        }
-
-        .modal-footer {
-            background-color: #f4f7fc;
         }
 
         /* Footer */
@@ -291,46 +165,6 @@ include 'config.php';
             .header-logo { height: 60px; }
             .navbar-brand { font-size: 1rem; }
         }
-
-        /* Additional styling for new sections */
-        .section-title {
-            font-size: 2rem;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: white;
-        }
-
-        .updates-list, .databases-list {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        .updates-list li, .databases-list li {
-            margin-bottom: 10px;
-            padding: 15px;
-            background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .updates-list li h5, .databases-list li h5 {
-            margin: 0;
-            font-size: 1.25rem;
-            font-weight: 500;
-        }
-
-        .updates-list li small, .databases-list li p {
-            color: #555;
-        }
-
-        .databases-list li a {
-            color: #3498db;
-            text-decoration: none;
-        }
-
-        .databases-list li a:hover {
-            text-decoration: underline;
-        }
     </style>
 </head>
 <body>
@@ -377,57 +211,71 @@ include 'config.php';
             </div>
         </nav>
     </header>
-    
-    <!-- Hero Section -->
-    <div class="hero-section">
-        <div class="overlay"></div>
-        <h1>Welcome to the City of Koronadal Public Library</h1>
-        <p>Your gateway to a wealth of knowledge and digital resources.</p>
-        <a href="signup.php" class="btn-cta">Join Now</a>
-    </div>
 
     <!-- Main Content -->
     <main class="main-content">
-        <!-- Check for success message in the URL -->
-        <?php if (isset($_GET['signup_success'])): ?>
-            <div id="successMessage" class="success-message" role="alert">
-                <?php echo htmlspecialchars($_GET['signup_success']); ?>
+        <!-- FAQ Section -->
+        <section class="faq-section">
+            <h2>Frequently Asked Questions</h2>
+            <div class="accordion" id="faqAccordion">
+                <div class="accordion-item">
+                    <h3 class="accordion-header" id="faqHeading1">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" 
+                                data-bs-target="#faqCollapse1" aria-expanded="true" aria-controls="faqCollapse1">
+                            How do I become a member of the library?
+                        </button>
+                    </h3>
+                    <div id="faqCollapse1" class="accordion-collapse collapse show" aria-labelledby="faqHeading1" 
+                         data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            To become a member, click the "Join Now" button on the homepage or visit the "Sign Up" page to create an account. Follow the instructions to complete your registration.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h3 class="accordion-header" id="faqHeading2">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                data-bs-target="#faqCollapse2" aria-expanded="false" aria-controls="faqCollapse2">
+                            What resources are available at the library?
+                        </button>
+                    </h3>
+                    <div id="faqCollapse2" class="accordion-collapse collapse" aria-labelledby="faqHeading2" 
+                         data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            We offer a wide range of digital resources, books, and documents for all ages and interests. You can access our Online Public Access Catalog (OPAC) to explore our collection.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h3 class="accordion-header" id="faqHeading3">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                data-bs-target="#faqCollapse3" aria-expanded="false" aria-controls="faqCollapse3">
+                            How can I contact the library for assistance?
+                        </button>
+                    </h3>
+                    <div id="faqCollapse3" class="accordion-collapse collapse" aria-labelledby="faqHeading3" 
+                         data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            You can reach us via email at <a href="mailto:city.of.koronadal.library@gmail.com">city.of.koronadal.library@gmail.com</a>, call us at (083) 825 5503, or visit our Contact Us section for more details.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h3 class="accordion-header" id="faqHeading4">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                data-bs-target="#faqCollapse4" aria-expanded="false" aria-controls="faqCollapse4">
+                            Are there any fees for using the library?
+                        </button>
+                    </h3>
+                    <div id="faqCollapse4" class="accordion-collapse collapse" aria-labelledby="faqHeading4" 
+                         data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Membership and access to most of our resources are free. Some services may have minimal fees; please contact us for specific details.
+                        </div>
+                    </div>
+                </div>
             </div>
-        <?php endif; ?>
-
-        <!-- What's New in the Library Section -->
-        <section class="container my-5">
-            <h2 class="section-title">What's New in the Library?</h2>
-            <ul class="updates-list">
-                <?php if (!empty($libraryUpdates)): ?>
-                    <?php foreach ($libraryUpdates as $update): ?>
-                        <li>
-                            <h5><?php echo htmlspecialchars($update['title']); ?></h5>
-                            <small><?php echo date('F j, Y', strtotime($update['date'])); ?></small>
-                            <p><?php echo htmlspecialchars($update['description']); ?></p>
-                        </li>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <li>No updates available at the moment. Please check back later!</li>
-                <?php endif; ?>
-            </ul>
         </section>
-
-
-        <!-- Divider before Contact -->
-        <div class="divider"></div>
-
-        <!-- Contact Info Section -->
-        <div class="contact-info">
-            <h2>Contact Us</h2>
-            <p>If you have any questions or need assistance, please feel free to contact us:</p>
-            <ul>
-                <li>Email: <a href="mailto:city.of.koronadal.library@gmail.com">city.of.koronadal.library@gmail.com</a></li>
-                <li>Phone: (083) 825 5503</li>
-                <li>Address: Old City Hall Building, Gensan Drive corner Morales Avenue (Roundball), Poblacion Zone II, Koronadal, Philippines, 9506</li>
-                <li>Facebook: <a href="https://www.facebook.com/KorCityLib" target="_blank">KorCityLib</a></li>
-            </ul>
-        </div>
     </main>
 
     <!-- Login Modal -->
@@ -511,15 +359,5 @@ include 'config.php';
 
     <!-- Bootstrap JS and dependencies -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const successMessage = document.getElementById('successMessage');
-            if (successMessage) {
-                setTimeout(() => {
-                    successMessage.style.display = 'none';
-                }, 2000); // Hide after 2 seconds
-            }
-        });
-    </script>
 </body>
 </html>
